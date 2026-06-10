@@ -186,8 +186,12 @@ fn clamp_window_position(
             return target;
         }
 
-        clamped.x = clamped.x.clamp(mx, max_x);
-        clamped.y = clamped.y.clamp(my, max_y);
+        // Safe clamp: if max < min (window larger than monitor), use min
+        let safe_clamp = |val: i32, min: i32, max: i32| -> i32 {
+            if min > max { min } else { val.clamp(min, max) }
+        };
+        clamped.x = safe_clamp(clamped.x, mx, max_x);
+        clamped.y = safe_clamp(clamped.y, my, max_y);
     }
 
     clamped

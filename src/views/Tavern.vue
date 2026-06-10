@@ -1458,101 +1458,212 @@ watch(
 @reference "../style.css";
 
 .config-card {
-  @apply bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden transition-all duration-300 shadow-sm;
+  background: linear-gradient(135deg, rgba(34, 26, 20, 0.9), rgba(26, 20, 16, 0.95));
+  border: 1px solid rgba(180, 140, 100, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .config-card-header {
-  @apply flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors select-none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  user-select: none;
+}
+.config-card-header:hover {
+  background: rgba(74, 53, 36, 0.3);
 }
 
 .header-left {
-  @apply flex items-center gap-4;
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .header-icon {
-  @apply w-10 h-10 rounded-xl flex items-center justify-center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .header-info {
-  @apply flex flex-col;
+  display: flex;
+  flex-direction: column;
 }
 
 .header-info .title {
-  @apply font-bold text-slate-800 dark:text-slate-100 text-[15px] tracking-tight;
+  font-weight: 700;
+  color: #e0c8a0;
+  font-size: 15px;
+  letter-spacing: -0.01em;
 }
 
 .header-info .desc {
-  @apply text-[11px] text-slate-500 dark:text-slate-400 mt-0.5;
+  font-size: 11px;
+  color: #9e7a5c;
+  margin-top: 2px;
 }
 
 .chevron {
-  @apply transition-transform duration-300 text-slate-400;
+  transition: transform 0.3s;
+  color: #9e7a5c;
 }
 
 .collapsed .chevron {
-  @apply -rotate-90;
+  transform: rotate(-90deg);
 }
 
 .config-card-body {
-  @apply border-t border-slate-100 dark:border-slate-700/50 transition-all duration-300 max-h-[5000px] opacity-100;
+  border-top: 1px solid rgba(180, 140, 100, 0.12);
+  transition: all 0.3s;
+  max-height: 5000px;
+  opacity: 1;
 }
 
 .collapsed .config-card-body {
-  @apply max-h-0 opacity-0 border-transparent overflow-hidden;
+  max-height: 0;
+  opacity: 0;
+  border-color: transparent;
+  overflow: hidden;
 }
 
 .input-group {
-  @apply flex flex-col gap-1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .input-label {
-  @apply text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1;
+  font-size: 11px;
+  font-weight: 700;
+  color: #b08a6a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-left: 4px;
 }
 
 .form-input {
-  @apply px-4 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 transition-all dark:text-slate-200;
+  padding: 10px 16px;
+  background: rgba(42, 30, 20, 0.5);
+  border: 1px solid rgba(180, 140, 100, 0.15);
+  border-radius: 12px;
+  font-size: 14px;
+  outline: none;
+  color: #e0c8a0;
+  transition: all 0.2s;
+}
+.form-input:focus {
+  border-color: #d4a574;
+  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
 }
 
 .setting-row {
-  @apply flex items-center justify-between gap-4 p-4 bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border border-slate-100 dark:border-slate-700/50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(42, 30, 20, 0.4);
+  border-radius: 16px;
+  border: 1px solid rgba(180, 140, 100, 0.12);
 }
 
 .setting-info {
-  @apply flex flex-col gap-0.5;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .setting-label {
-  @apply text-sm font-bold text-slate-700 dark:text-slate-200;
+  font-size: 14px;
+  font-weight: 700;
+  color: #e0c8a0;
 }
 
 .setting-desc {
-  @apply text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed;
+  font-size: 11px;
+  color: #9e7a5c;
+  line-height: 1.6;
 }
 
 /* 开关组件 */
 .toggle-switch {
-  @apply relative inline-flex items-center cursor-pointer shrink-0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .toggle-switch input {
-  @apply absolute opacity-0 w-0 h-0;
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
 .toggle-slider {
-  @apply w-11 h-6 bg-slate-200 dark:bg-slate-700 rounded-full peer-checked:bg-blue-600 transition-all after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 shadow-sm;
+  width: 44px;
+  height: 24px;
+  background: #2d1f14;
+  border-radius: 999px;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.toggle-slider::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  background: #d4a574;
+  border-radius: 999px;
+  height: 20px;
+  width: 20px;
+  transition: all 0.2s;
+}
+.peer:checked ~ .toggle-slider {
+  background: #8b6914;
+}
+.peer:checked ~ .toggle-slider::after {
+  transform: translateX(20px);
+  background: #e6b422;
 }
 
 /* 复选框药丸 */
 .checkbox-pill {
-  @apply flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 rounded-xl cursor-pointer text-[12px] font-bold text-slate-500 dark:text-slate-400 border border-transparent transition-all active:scale-95 select-none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(42, 30, 20, 0.5);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  color: #9e7a5c;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+  user-select: none;
 }
-
+.checkbox-pill:active {
+  transform: scale(0.95);
+}
 .checkbox-pill:has(input:checked) {
-  @apply bg-blue-600 text-white shadow-lg shadow-blue-500/20;
+  background: #8b6914;
+  color: #fdf4dc;
+  box-shadow: 0 0 12px rgba(230, 180, 34, 0.15);
 }
 
 .checkbox-pill input {
-  @apply hidden;
+  display: none;
 }
 
 .animate-in {
@@ -1564,7 +1675,6 @@ watch(
     opacity: 0;
     transform: translateY(-8px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1576,6 +1686,7 @@ watch(
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-300 dark:bg-slate-700 rounded-full;
+  background: #4a3524;
+  border-radius: 999px;
 }
 </style>

@@ -1,17 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>酒馆启动器</title>
+  <title>Tavern Deepseek - 酒馆启动器</title>
   <style type="text/css">
     body, html {
       margin: 0;
       padding: 0;
       height: 100%;
-      background-color: #f8fafc; /* Tailwind slate-50 */
+      background-color: #120c08;
       font-family: system-ui, -apple-system, sans-serif;
     }
 
@@ -26,23 +26,35 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 24px;
+      gap: 28px;
+      background:
+        radial-gradient(ellipse at 50% 30%, rgba(230, 180, 34, 0.06) 0%, transparent 60%),
+        radial-gradient(ellipse at 30% 70%, rgba(212, 165, 116, 0.04) 0%, transparent 50%),
+        #120c08;
+    }
+
+    .app-loader-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 18px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 25px rgba(212, 165, 116, 0.12);
+      animation: logoPulse 2s ease-in-out infinite;
     }
 
     .app-loader {
-      width: 48px;
-      height: 48px;
-      border: 4px solid #e2e8f0; /* slate-200 */
-      border-bottom-color: #3b82f6; /* blue-500 */
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(180, 140, 100, 0.2);
+      border-bottom-color: #d4a574;
       border-radius: 50%;
       animation: rotation 1s linear infinite;
     }
 
     .app-loader-text {
-      color: #64748b; /* slate-500 */
+      color: #a0785a;
       font-size: 14px;
       font-weight: 500;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
       animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
     }
 
@@ -53,7 +65,16 @@
 
     @keyframes pulse {
       0%, 100% { opacity: 1; }
-      50% { opacity: .5; }
+      50% { opacity: .4; }
+    }
+
+    @keyframes logoPulse {
+      0%, 100% {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), 0 0 25px rgba(212, 165, 116, 0.12);
+      }
+      50% {
+        box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5), 0 0 40px rgba(230, 180, 34, 0.2);
+      }
     }
   </style>
 </head>
@@ -61,8 +82,9 @@
 <body>
   <div id="app">
     <div class="app-loader-container">
+      <img src="/src/assets/logo.png" alt="Tavern Deepseek" class="app-loader-logo" />
       <div class="app-loader"></div>
-      <div class="app-loader-text">Loading SillyTavern Launcher GUI...</div>
+      <div class="app-loader-text">酒馆正在准备中...</div>
     </div>
   </div>
   <script type="module" src="/src/main.ts"></script>

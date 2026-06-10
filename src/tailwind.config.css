@@ -2,21 +2,66 @@
 
 @theme {
   --font-sans: "Inter", "SF Pro Display", "BlinkMacSystemFont", "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", "Arial", sans-serif;
-  --font-mono: "Inter", "SF Pro Display", "BlinkMacSystemFont", "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", "Arial", monospace;
-  
-  --color-primary: #4DB7FF;
-  --color-primary-hover: #66C5FF;
-  --color-primary-active: #1FA4FF;
-  --color-primary-light: #E0F2FE;
-  --color-success: #4ADE80;
-  --color-warning: #FFB347;
-  --color-error: #FF6B6B;
-  --color-surface: #F8FAFC;
-  --color-card: #FFFFFF;
-  --color-border: #E2E8F0;
-  
-  --shadow-soft: 0 8px 30px rgba(0,0,0,0.04);
-  --shadow-float: 0 10px 40px rgba(77, 183, 255, 0.2);
-  --shadow-menu: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-  --shadow-modal: 0 20px 50px -12px rgba(0, 0, 0, 0.15);
+  --font-mono: "JetBrains Mono", "SF Mono", "Menlo", "Consolas", monospace;
+  --font-display: "Georgia", "Times New Roman", "STSong", serif;
+
+  /* === Medieval Tavern Color Palette === */
+  /* Deep wood background */
+  --color-tavern-950: #120c08;
+  --color-tavern-900: #1a1410;
+  --color-tavern-850: #221a14;
+  --color-tavern-800: #2d1f14;
+  --color-tavern-750: #3a2a1a;
+  --color-tavern-700: #4a3524;
+  --color-tavern-600: #5c4430;
+
+  /* Warm parchment / amber */
+  --color-parchment-950: #5c3d2e;
+  --color-parchment-900: #6b4a35;
+  --color-parchment-800: #7a5940;
+  --color-parchment-700: #9e7a5c;
+  --color-parchment-600: #b08a6a;
+  --color-parchment-500: #b8926a;
+  --color-parchment-400: #c4956a;
+  --color-parchment-300: #d4a574;
+  --color-parchment-200: #e0c8a0;
+  --color-parchment-100: #efe0c8;
+  --color-parchment-50: #f5ede0;
+
+  /* Gold / Ember accents */
+  --color-ember-600: #b8860b;
+  --color-ember-500: #d4a017;
+  --color-ember-400: #e6b422;
+  --color-ember-300: #f0c75e;
+  --color-ember-200: #f5d680;
+  --color-ember-100: #fae8b4;
+  --color-ember-50: #fdf4dc;
+
+  /* Warm fire glow */
+  --color-fire-600: #c0392b;
+  --color-fire-500: #e67e22;
+  --color-fire-400: #f39c12;
+  --color-fire-300: #f5b041;
+  --color-fire-200: #f8c471;
+
+  /* Primary brand color */
+  --color-primary: #d4a574;
+  --color-primary-hover: #e0c8a0;
+  --color-primary-active: #b8926a;
+  --color-primary-light: #3a2a1a;
+
+  /* Utility colors */
+  --color-success: #27ae60;
+  --color-warning: #f39c12;
+  --color-error: #c0392b;
+  --color-surface: #1a1410;
+  --color-card: #221a14;
+  --color-border: #4a3524;
+
+  /* Shadows */
+  --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.4);
+  --shadow-float: 0 10px 40px rgba(212, 165, 116, 0.15);
+  --shadow-menu: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  --shadow-modal: 0 20px 50px -12px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px rgba(230, 180, 34, 0.15), 0 0 40px rgba(230, 180, 34, 0.05);
 }

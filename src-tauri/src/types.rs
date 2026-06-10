@@ -636,6 +636,8 @@ pub struct CharacterCardFile {
     pub file_name: String,
     pub size: u64,
     pub modified_ms: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub category: Option<String>,
 }
 
 #[derive(Serialize)]

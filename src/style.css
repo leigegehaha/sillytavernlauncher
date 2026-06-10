@@ -16,15 +16,15 @@
     sans-serif;
 }
 
+/* === Medieval Tavern Theme === */
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #F8FAFC;
-  color: #1E293B;
+  background-color: #120c08;
+  color: #e0c8a0;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
-
   font-family: var(--font-main) !important;
   font-weight: 400;
   font-size: 16px;
@@ -32,120 +32,129 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* 暗色主题 */
-.dark body {
-  background-color: #0F172A;
-  color: #E2E8F0;
+/* Subtle parchment texture overlay on body */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(212, 165, 116, 0.05) 2px, rgba(212, 165, 116, 0.05) 4px),
+    radial-gradient(ellipse at 20% 50%, rgba(230, 180, 34, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(230, 180, 34, 0.03) 0%, transparent 40%);
 }
 
-/* 暗色主题下的通用样式增强 */
-.dark ::-webkit-scrollbar-thumb {
-  background: #475569;
+/* Scrollbar - warm tavern style */
+::-webkit-scrollbar {
+  width: 5px;
 }
 
-.dark .bg-white {
-  background-color: #1E293B;
+::-webkit-scrollbar-track {
+  background: #1a1410;
 }
 
-.dark .border-slate-100,
-.dark .border-slate-200 {
-  border-color: #334155;
+::-webkit-scrollbar-thumb {
+  background: #4a3524;
+  border-radius: 10px;
 }
 
-.dark .text-slate-700,
-.dark .text-slate-800 {
-  color: #E2E8F0;
+::-webkit-scrollbar-thumb:hover {
+  background: #6b4a35;
 }
 
-.dark .text-slate-500,
-.dark .text-slate-600 {
-  color: #94A3B8;
+/* Focus outlines */
+*:focus-visible {
+  outline: 2px solid #d4a574;
+  outline-offset: 2px;
 }
 
-.dark .text-slate-400 {
-  color: #64748B;
-}
-
-.dark .bg-slate-50 {
-  background-color: #0F172A;
-}
-
-.dark .bg-slate-100 {
-  background-color: #1E293B;
-}
-
-.dark input,
-.dark textarea,
-.dark select {
-  background-color: #1E293B;
-  border-color: #334155;
-  color: #E2E8F0;
-}
-
-.dark input:focus,
-.dark textarea:focus,
-.dark select:focus {
-  border-color: #3B82F6;
-  background-color: #1E293B;
-}
-
-.dark .shadow-sm {
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-}
-
-.dark .shadow-md {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-}
-
+/* Buttons */
 button:hover {
   cursor: pointer;
 }
 
 button:disabled {
   cursor: not-allowed;
+  opacity: 0.5;
 }
 
 a:disabled {
   cursor: not-allowed;
 }
 
-/* Floating Button */
+/* === Glass Morphism - Tavern Style === */
+.tavern-glass {
+  background: rgba(34, 26, 20, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(180, 140, 100, 0.15);
+}
+
+.tavern-glass-light {
+  background: rgba(42, 30, 20, 0.5);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(180, 140, 100, 0.1);
+}
+
+.tavern-card {
+  background: linear-gradient(135deg, rgba(34, 26, 20, 0.9), rgba(26, 20, 16, 0.95));
+  border: 1px solid rgba(180, 140, 100, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tavern-card:hover {
+  border-color: rgba(230, 180, 34, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 30px rgba(212, 165, 116, 0.08);
+}
+
+/* === Floating Button === */
 .fab {
   width: 52px;
   height: 52px;
-  border-radius: 18px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s var(--ease-spring);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(230, 180, 34, 0.1);
   position: fixed;
   bottom: 32px;
   z-index: 1000;
+  background: linear-gradient(135deg, #4a3524, #3a2a1a);
+  border: 1px solid rgba(212, 165, 116, 0.3);
+  color: #e0c8a0;
 }
 
 .fab:hover {
   transform: scale(1.08) translateY(-3px);
+  background: linear-gradient(135deg, #5c4430, #4a3524);
+  border-color: rgba(230, 180, 34, 0.5);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 25px rgba(230, 180, 34, 0.15);
 }
 
-/* View Animations */
+/* === View Animations === */
 .view-section {
-  animation: fadeIn 0.4s var(--ease-spring);
+  animation: tavernFadeIn 0.5s var(--ease-spring);
 }
 
-@keyframes fadeIn {
+@keyframes tavernFadeIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(12px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-/* Dropdown & Modal States */
+/* === Dropdown & Modal States === */
 .hidden-custom {
   opacity: 0;
   transform: scale(0.95) translateY(-10px);
@@ -177,22 +186,12 @@ a:disabled {
   transform: scale(1) translateY(0);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 10px;
-}
-
+/* === Toast Animation === */
 @keyframes toastSlideIn {
   from {
     opacity: 0;
     transform: translate(-50%, -20px) scale(0.95);
   }
-
   to {
     opacity: 1;
     transform: translate(-50%, 0) scale(1);
@@ -202,3 +201,405 @@ a:disabled {
 .toast-animate {
   animation: toastSlideIn 0.3s var(--ease-spring) forwards;
 }
+
+/* === Parchment Glow Border Effect === */
+.tavern-border-glow {
+  position: relative;
+}
+
+.tavern-border-glow::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(212, 165, 116, 0.3), transparent 40%, transparent 60%, rgba(230, 180, 34, 0.15));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* === Input / Form Fields === */
+input,
+textarea,
+select {
+  background-color: #1a1410;
+  border-color: #4a3524;
+  color: #e0c8a0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #d4a574;
+  box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.15);
+  outline: none;
+  background-color: #1a1410;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6b4a35;
+}
+
+/* === Button Styles === */
+.tavern-btn {
+  background: linear-gradient(135deg, #3a2a1a, #2d1f14);
+  border: 1px solid rgba(180, 140, 100, 0.25);
+  color: #e0c8a0;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.tavern-btn:hover {
+  background: linear-gradient(135deg, #4a3524, #3a2a1a);
+  border-color: rgba(212, 165, 116, 0.5);
+  box-shadow: 0 0 15px rgba(212, 165, 116, 0.1);
+}
+
+.tavern-btn-primary {
+  background: linear-gradient(135deg, #6b4a35, #4a3524);
+  border-color: rgba(212, 165, 116, 0.4);
+}
+
+.tavern-btn-primary:hover {
+  background: linear-gradient(135deg, #7a5940, #5c4430);
+  border-color: rgba(230, 180, 34, 0.6);
+  box-shadow: 0 0 20px rgba(230, 180, 34, 0.15);
+}
+
+/* === Ornamental Divider === */
+.tavern-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(180, 140, 100, 0.3), transparent);
+  margin: 16px 0;
+}
+
+/* === Heading Styles === */
+.tavern-heading {
+  font-family: Georgia, "Times New Roman", serif;
+  color: #e0c8a0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tavern-heading-gold {
+  color: #e6b422;
+  text-shadow: 0 0 10px rgba(230, 180, 34, 0.2), 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* ======================================== */
+/*  GLOBAL TAVERN THEME OVERRIDES           */
+/*  All Tailwind classes → Medieval Tavern   */
+/* ======================================== */
+
+/* --- Backgrounds --- */
+.bg-white { background-color: #221a14 !important; }
+.bg-slate-50 { background-color: #1a1410 !important; }
+.bg-slate-100 { background-color: #221a14 !important; }
+.bg-slate-200 { background-color: #2d1f14 !important; }
+
+/* Blue → Amber */
+.bg-blue-50 { background-color: rgba(74, 53, 36, 0.5) !important; }
+.bg-blue-100 { background-color: rgba(74, 53, 36, 0.6) !important; }
+.bg-blue-600 { background-color: #8b6914 !important; }
+.bg-blue-900\/30 { background-color: rgba(74, 53, 36, 0.4) !important; }
+
+/* Purple → Gold */
+.bg-purple-50 { background-color: rgba(180, 140, 100, 0.15) !important; }
+.bg-purple-900\/30 { background-color: rgba(180, 140, 100, 0.12) !important; }
+.text-purple-500 { color: #e6b422 !important; }
+
+/* Green / Emerald */
+.bg-emerald-50 { background-color: rgba(39, 174, 96, 0.1) !important; }
+.bg-emerald-100 { background-color: rgba(39, 174, 96, 0.15) !important; }
+.bg-emerald-900\/30 { background-color: rgba(39, 174, 96, 0.12) !important; }
+.text-emerald-600 { color: #2ecc71 !important; }
+.border-emerald-200 { border-color: rgba(39, 174, 96, 0.25) !important; }
+
+/* Red */
+.bg-red-50 { background-color: rgba(192, 57, 43, 0.1) !important; }
+.bg-red-100 { background-color: rgba(192, 57, 43, 0.15) !important; }
+.bg-red-900\/30 { background-color: rgba(192, 57, 43, 0.12) !important; }
+.text-red-600 { color: #e74c3c !important; }
+.border-red-300 { border-color: rgba(192, 57, 43, 0.25) !important; }
+
+/* Orange → Warm Copper */
+.bg-orange-50 { background-color: rgba(210, 120, 40, 0.1) !important; }
+.bg-orange-100 { background-color: rgba(210, 120, 40, 0.15) !important; }
+.bg-orange-500 { background-color: #a0522d !important; }
+.bg-orange-600 { background-color: #8b4513 !important; }
+.bg-orange-900\/30 { background-color: rgba(180, 100, 40, 0.12) !important; }
+.text-orange-600 { color: #d4a574 !important; }
+.hover\\:bg-orange-600:hover { background-color: #7a3b1a !important; }
+
+/* --- Text Colors --- */
+.text-slate-200 { color: #e0c8a0 !important; }
+.text-slate-300 { color: #d4a574 !important; }
+.text-slate-400 { color: #b8926a !important; }
+.text-slate-500 { color: #a0785a !important; }
+.text-slate-600 { color: #7a5940 !important; }
+.text-slate-700 { color: #d4a574 !important; }
+.text-slate-800 { color: #e0c8a0 !important; }
+
+/* Blue → Amber/Gold */
+.text-blue-600 { color: #e6b422 !important; }
+.text-blue-500 { color: #d4a574 !important; }
+.text-blue-400 { color: #e6b422 !important; }
+
+/* Hover text */
+.hover\\:text-slate-600:hover { color: #f0c75e !important; }
+.hover\\:text-slate-700:hover { color: #e6b422 !important; }
+.hover\\:text-slate-900:hover { color: #f5ede0 !important; }
+.hover\\:text-primary:hover { color: #e6b422 !important; }
+
+/* --- Borders --- */
+.border-slate-100 { border-color: rgba(180, 140, 100, 0.15) !important; }
+.border-slate-200 { border-color: rgba(180, 140, 100, 0.2) !important; }
+.border-slate-200\/80 { border-color: rgba(180, 140, 100, 0.18) !important; }
+.border-slate-700 { border-color: rgba(180, 140, 100, 0.15) !important; }
+.border-blue-200 { border-color: rgba(212, 165, 116, 0.3) !important; }
+
+/* --- Hover Backgrounds --- */
+.hover\\:bg-slate-100:hover { background-color: rgba(74, 53, 36, 0.5) !important; }
+.hover\\:bg-slate-50:hover { background-color: rgba(58, 42, 26, 0.4) !important; }
+.hover\\:bg-blue-50:hover { background-color: rgba(74, 53, 36, 0.5) !important; }
+.hover\\:bg-blue-100:hover { background-color: rgba(74, 53, 36, 0.6) !important; }
+.hover\\:bg-emerald-100:hover { background-color: rgba(39, 174, 96, 0.2) !important; }
+.hover\\:bg-red-100:hover { background-color: rgba(192, 57, 43, 0.2) !important; }
+
+/* Hover border */
+.hover\\:border-blue-200:hover { border-color: rgba(230, 180, 34, 0.4) !important; }
+
+/* --- Shadows --- */
+.shadow-sm {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+}
+.shadow-md {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+}
+.shadow-blue-500\\/20 {
+  box-shadow: 0 0 20px rgba(230, 180, 34, 0.15) !important;
+}
+
+/* --- Blue tabs → Amber --- */
+.bg-blue-600 { background-color: #8b6914 !important; }
+
+/* --- Modal/dialog backgrounds --- */
+.modal-box, .modal {
+  background-color: #221a14 !important;
+  border: 1px solid rgba(180, 140, 100, 0.2) !important;
+  color: #e0c8a0 !important;
+}
+
+/* --- DaisyUI component overrides --- */
+.btn-primary {
+  background: linear-gradient(135deg, #6b4a35, #4a3524) !important;
+  border-color: rgba(212, 165, 116, 0.4) !important;
+  color: #f5ede0 !important;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #7a5940, #5c4430) !important;
+}
+
+.btn-ghost {
+  color: #d4a574 !important;
+}
+.btn-ghost:hover {
+  background: rgba(74, 53, 36, 0.5) !important;
+  color: #e6b422 !important;
+}
+
+/* --- Tables --- */
+.table {
+  color: #e0c8a0 !important;
+}
+.table th {
+  color: #d4a574 !important;
+  background-color: #1a1410 !important;
+  border-color: rgba(180, 140, 100, 0.15) !important;
+}
+.table td {
+  border-color: rgba(180, 140, 100, 0.1) !important;
+}
+
+/* --- Badges / tags --- */
+.badge {
+  color: #e0c8a0 !important;
+  border-color: rgba(180, 140, 100, 0.25) !important;
+}
+
+/* --- Tabs underline --- */
+.border-b-slate-200, .border-b-slate-700 {
+  border-bottom-color: rgba(180, 140, 100, 0.2) !important;
+}
+
+/* --- Separators --- */
+.divider {
+  border-color: rgba(180, 140, 100, 0.15) !important;
+}
+
+/* --- Code/pre blocks --- */
+pre, code {
+  background-color: #1a1410 !important;
+  color: #d4a574 !important;
+  border-color: rgba(180, 140, 100, 0.15) !important;
+}
+
+/* --- Form inputs (additional) --- */
+textarea, select, input[type="text"], input[type="number"], input[type="password"], input[type="url"] {
+  background-color: #1a1410 !important;
+  border-color: #4a3524 !important;
+  color: #e0c8a0 !important;
+}
+
+/* --- Toggle/switch --- */
+.toggle {
+  background-color: #4a3524 !important;
+}
+.toggle:checked {
+  background-color: #d4a574 !important;
+}
+
+/* --- Select dropdown --- */
+select option {
+  background-color: #221a14 !important;
+  color: #e0c8a0 !important;
+}
+
+/* --- Alert/notification --- */
+.alert {
+  background-color: #221a14 !important;
+  border-color: rgba(180, 140, 100, 0.2) !important;
+  color: #e0c8a0 !important;
+}
+
+.alert-info {
+  background-color: rgba(74, 53, 36, 0.5) !important;
+  border-color: rgba(212, 165, 116, 0.3) !important;
+}
+
+.alert-success {
+  background-color: rgba(39, 174, 96, 0.1) !important;
+  border-color: rgba(39, 174, 96, 0.3) !important;
+}
+
+.alert-error {
+  background-color: rgba(192, 57, 43, 0.12) !important;
+  border-color: rgba(192, 57, 43, 0.3) !important;
+}
+
+.alert-warning {
+  background-color: rgba(230, 180, 34, 0.08) !important;
+  border-color: rgba(230, 180, 34, 0.3) !important;
+}
+
+/* --- Menu/Dropdown --- */
+.menu {
+  background-color: #221a14 !important;
+  border: 1px solid rgba(180, 140, 100, 0.15) !important;
+}
+.menu li:hover {
+  background-color: rgba(74, 53, 36, 0.5) !important;
+}
+
+/* --- Tooltip --- */
+.tooltip-content {
+  background-color: #2d1f14 !important;
+  color: #e0c8a0 !important;
+  border: 1px solid rgba(180, 140, 100, 0.2) !important;
+}
+
+/* --- Accent color override --- */
+.text-primary {
+  color: #e6b422 !important;
+}
+.bg-primary {
+  background: linear-gradient(135deg, #6b4a35, #5c3d2e) !important;
+}
+.hover\\:bg-primary\\/90:hover {
+  background: linear-gradient(135deg, #7a5940, #6b4a35) !important;
+}
+.bg-error {
+  background: linear-gradient(135deg, #8b2500, #a02040) !important;
+}
+.hover\\:bg-error\\/90:hover {
+  background: linear-gradient(135deg, #9c2a00, #b02550) !important;
+}
+
+/* --- Label/text-xs muted --- */
+.text-xs.font-bold.uppercase.tracking-wider {
+  color: #b8926a !important;
+}
+
+/* --- Card heading icons --- */
+.text-blue-500 { color: #e6b422 !important; }
+
+/* --- Progress bar --- */
+.progress {
+  background-color: #2d1f14 !important;
+}
+.progress::-webkit-progress-value {
+  background: linear-gradient(90deg, #8b6914, #e6b422) !important;
+}
+
+/* --- Dark mode not needed, we're always dark --- */
+.dark body { background-color: #120c08; color: #e0c8a0; }
+.dark .bg-white { background-color: #221a14; }
+.dark .bg-slate-800 { background-color: #221a14; }
+.dark .bg-slate-900 { background-color: #1a1410; }
+.dark .bg-slate-950\/50 { background-color: #120c08; }
+.dark .bg-slate-900\/50 { background-color: rgba(42, 30, 20, 0.5); }
+.dark .border-slate-700 { border-color: rgba(180, 140, 100, 0.15); }
+.dark .border-slate-700\/80 { border-color: rgba(180, 140, 100, 0.15); }
+.dark .text-slate-200 { color: #e0c8a0; }
+.dark .text-slate-300 { color: #d4a574; }
+.dark .text-slate-400 { color: #b8926a; }
+.dark .text-slate-500 { color: #a0785a; }
+.dark .text-slate-100 { color: #f5ede0; }
+.dark .bg-blue-900\/30 { background-color: rgba(74, 53, 36, 0.4); }
+.dark .bg-blue-900\/40 { background-color: rgba(74, 53, 36, 0.5); }
+.dark .text-blue-400 { color: #e6b422; }
+.dark .text-blue-600 { color: #e6b422; }
+.dark .bg-blue-800\/60 { background-color: rgba(74, 53, 36, 0.6); }
+.dark .border-blue-800 { border-color: rgba(212, 165, 116, 0.3); }
+.dark .bg-purple-900\/30 { background-color: rgba(180, 140, 100, 0.12); }
+.dark .text-purple-400 { color: #e6b422; }
+.dark .bg-emerald-900\/30 { background-color: rgba(39, 174, 96, 0.12); }
+.dark .text-emerald-400 { color: #2ecc71; }
+.dark .border-emerald-800 { border-color: rgba(39, 174, 96, 0.25); }
+.dark .bg-orange-900\/30 { background-color: rgba(180, 100, 40, 0.12); }
+.dark .text-orange-400 { color: #d4a574; }
+.dark .bg-red-900\/30 { background-color: rgba(192, 57, 43, 0.12); }
+.dark .text-red-400 { color: #e74c3c; }
+.dark .border-red-800 { border-color: rgba(192, 57, 43, 0.25); }
+.dark input, .dark textarea, .dark select {
+  background-color: #1a1410;
+  border-color: #4a3524;
+  color: #e0c8a0;
+}
+.dark input:focus, .dark textarea:focus, .dark select:focus {
+  border-color: #d4a574;
+  background-color: #1a1410;
+}
+.dark .shadow-sm { box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); }
+.dark .shadow-md { box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); }
+.dark .hover\\:bg-slate-100:hover { background-color: rgba(74, 53, 36, 0.5); }
+.dark .hover\\:bg-slate-800:hover { background-color: rgba(74, 53, 36, 0.5); }
+.dark .hover\\:bg-slate-900:hover { background-color: rgba(58, 42, 26, 0.5); }
+.dark .hover\\:bg-blue-900\/30:hover { background-color: rgba(74, 53, 36, 0.5); }
+.dark .hover\\:bg-emerald-900\/50:hover { background-color: rgba(39, 174, 96, 0.2); }
+.dark .hover\\:bg-red-900\/50:hover { background-color: rgba(192, 57, 43, 0.2); }
+.dark .hover\\:text-slate-200:hover { color: #f0c75e; }
+.dark .hover\\:text-slate-100:hover { color: #f5ede0; }
+.dark .hover\\:text-blue-400:hover { color: #f0c75e; }
+
+/* --- DaTailwind: make sure content area also dark --- */
+.bg-slate-50\\/50 { background-color: #120c08 !important; }
+.dark .bg-slate-950\\/50 { background-color: #120c08 !important; }

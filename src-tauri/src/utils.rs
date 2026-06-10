@@ -5,7 +5,6 @@ use std::io;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 use tracing_subscriber::{filter::EnvFilter, layer::SubscriberExt, Registry};
-use tauri::Manager;
 
 use crate::types::AppConfig;
 
@@ -156,7 +155,7 @@ pub fn init_logger(data_dir: &Path) {
 
     // 环境级过滤：默认 info，本应用 debug，从而过滤无关底层网络杂乱日志
     let env_filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new("info,sillytavern_launcher_lib=debug"));
+        .unwrap_or_else(|_| EnvFilter::new("info,tavern_deepseek_launcher_lib=debug"));
 
     let subscriber = Registry::default()
         .with(env_filter)

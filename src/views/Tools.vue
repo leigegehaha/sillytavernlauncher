@@ -4,15 +4,20 @@
       <h2 class="text-lg font-bold text-slate-700 border-b border-slate-100 pb-2">
         {{ category }}
       </h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <button
           v-for="(tool, index) in toolList"
           :key="index"
-          class="group bg-white p-5 rounded-2xl border border-slate-200 hover:border-blue-500/30 hover:shadow-md transition-all duration-300 flex items-start gap-4 text-left"
+          class="group p-5 rounded-2xl border transition-all duration-300 flex items-start gap-4 text-left tavern-card"
+          style="border-color: rgba(180, 140, 100, 0.15);"
           @click="openLink(tool.url)"
+          @mouseenter="(e: any) => { e.target.style.borderColor = 'rgba(230, 180, 34, 0.4)'; e.target.style.boxShadow = '0 0 25px rgba(230, 180, 34, 0.1)'; }"
+          @mouseleave="(e: any) => { e.target.style.borderColor = 'rgba(180, 140, 100, 0.15)'; e.target.style.boxShadow = 'none'; }"
         >
           <div
-            class="w-12 h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300 overflow-hidden"
+            class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-300 overflow-hidden"
+            style="background: rgba(180, 140, 100, 0.15);"
+            :class="{ 'group-hover:scale-110': true }"
           >
             <img
               v-if="tool.icon && !imageErrors[`${category}-${index}`]"
@@ -21,16 +26,18 @@
               class="w-full h-full object-cover"
               @error="handleImageError(category, index)"
             />
-            <component :is="tool.defaultIcon" v-else-if="tool.defaultIcon" class="w-6 h-6" />
-            <Wrench v-else class="w-6 h-6" />
+            <component :is="tool.defaultIcon" v-else-if="tool.defaultIcon" class="w-6 h-6" style="color: #e6b422;" />
+            <Zap v-else class="w-6 h-6" style="color: #e6b422;" />
           </div>
           <div class="flex-1 min-w-0 pt-1">
-            <h3 class="text-base font-bold text-slate-800 mb-1 group-hover:text-blue-600 transition-colors">
+            <h3 class="text-base font-bold mb-1 transition-colors" style="color: #e0c8a0; font-family: Georgia, 'Times New Roman', serif;">
               {{ tool.name }}
             </h3>
-            <p class="text-xs text-slate-500 truncate">{{ tool.url }}</p>
+            <p class="text-xs" style="color: #9e7a5c; line-height: 1.5;">
+              {{ (tool as any).desc || tool.url }}
+            </p>
           </div>
-          <div class="text-slate-300 group-hover:text-blue-500 transition-colors pt-2">
+          <div class="pt-2 transition-colors" style="color: #9e7a5c;">
             <ExternalLink class="w-4 h-4" />
           </div>
         </button>
@@ -41,7 +48,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Wrench, ExternalLink } from 'lucide-vue-next'
+import { Wrench, ExternalLink, Zap } from 'lucide-vue-next'
 import { openUrl as open } from '@tauri-apps/plugin-opener'
 // import { useI18n } from 'vue-i18n'; // 暂未使用
 import config from '../lib/config'

@@ -2,6 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use tauri::AppHandle;
+use tauri::Manager;
 
 use crate::types::CharacterCardFile;
 
@@ -69,6 +70,7 @@ pub async fn list_character_card_pngs(app: AppHandle) -> Result<Vec<CharacterCar
                 file_name,
                 size: meta.len(),
                 modified_ms,
+                category: None,
             });
         }
 
@@ -239,6 +241,287 @@ pub async fn import_character_card_from_bytes(
         // 3. 将传入的字节流写入文件
         fs::write(&target_path, bytes).map_err(|e| format!("写入文件失败: {}", e))?;
 
+        Ok(())
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+// ─────────────────────────────────────────────
+// 预设资源（bundled presets）
+// ─────────────────────────────────────────────
+
+fn get_bundled_presets_dir(app: &AppHandle) -> PathBuf {
+    let resource_dir = app
+        .path()
+        .resource_dir()
+        .unwrap_or_else(|_| PathBuf::from("."));
+    resource_dir.join("presets")
+}
+
+fn get_user_presets_dir(app: &AppHandle) -> PathBuf {
+    let data_dir = crate::utils::get_st_data_dir(app);
+    data_dir.join("default-user").join("settings")
+}
+
+#[tauri::command]
+pub async fn list_bundled_presets(app: AppHandle) -> Result<Vec<CharacterCardFile>, String> {
+    let app_clone = app.clone();
+    tokio::task::spawn_blocking(move || {
+        let base_dir = get_bundled_presets_dir(&app_clone);
+        if !base_dir.exists() {
+            return Ok(Vec::new());
+        }
+
+        let mut result = Vec::new();
+        let category_entries = fs::read_dir(&base_dir).map_err(|e| e.to_string())?;
+
+        for cat_entry in category_entries {
+            let cat_entry = match cat_entry {
+                Ok(v) => v,
+                Err(_) => continue,
+            };
+            if !cat_entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+                continue;
+            }
+            let category = match cat_entry.file_name().into_string() {
+                Ok(s) => s,
+                Err(_) => continue,
+            };
+            let cat_path = cat_entry.path();
+            let file_entries = match fs::read_dir(&cat_path) {
+                Ok(v) => v,
+                Err(_) => continue,
+            };
+
+            for file_entry in file_entries {
+                let file_entry = match file_entry {
+                    Ok(v) => v,
+                    Err(_) => continue,
+                };
+                if !file_entry.file_type().map(|t| t.is_file()).unwrap_or(false) {
+                    continue;
+                }
+                let path = file_entry.path();
+                let ext_ok = path
+                    .extension()
+                    .and_then(|s| s.to_str())
+                    .map(|s| s.eq_ignore_ascii_case("json"))
+                    .unwrap_or(false);
+                if !ext_ok {
+                    continue;
+                }
+                let file_name = match path.file_name().and_then(|s| s.to_str()) {
+                    Some(v) => v.to_string(),
+                    None => continue,
+                };
+                let meta = match file_entry.metadata() {
+                    Ok(v) => v,
+                    Err(_) => continue,
+                };
+
+                result.push(CharacterCardFile {
+                    file_name,
+                    size: meta.len(),
+                    modified_ms: None,
+                    category: Some(category.clone()),
+                });
+            }
+        }
+
+        result.sort_by(|a, b| a.file_name.to_lowercase().cmp(&b.file_name.to_lowercase()));
+        Ok(result)
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
+pub async fn import_bundled_preset(
+    app: AppHandle,
+    category: String,
+    file_name: String,
+) -> Result<(), String> {
+    if file_name.trim().is_empty() || category.trim().is_empty() {
+        return Err("参数不能为空".to_string());
+    }
+    if file_name.contains("..") || file_name.contains('/') || file_name.contains('\\') {
+        return Err("文件名不合法".to_string());
+    }
+    if category.contains("..") || category.contains('/') || category.contains('\\') {
+        return Err("分类名不合法".to_string());
+    }
+
+    let app_clone = app.clone();
+    tokio::task::spawn_blocking(move || {
+        let bundled_dir = get_bundled_presets_dir(&app_clone);
+        let source_path = bundled_dir.join(&category).join(&file_name);
+        if !source_path.exists() {
+            return Err("预设文件不存在".to_string());
+        }
+
+        let target_dir = get_user_presets_dir(&app_clone);
+        if !target_dir.exists() {
+            fs::create_dir_all(&target_dir).map_err(|e| format!("创建目录失败: {}", e))?;
+        }
+
+        // Presets go to settings/AI配置名称.json
+        let target_path = target_dir.join(&file_name);
+        if target_path.exists() {
+            return Err("同名预设已存在".to_string());
+        }
+
+        fs::copy(&source_path, &target_path).map_err(|e| format!("复制失败: {}", e))?;
+        Ok(())
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+fn get_bundled_cards_dir(app: &AppHandle) -> PathBuf {
+    let resource_dir = app
+        .path()
+        .resource_dir()
+        .unwrap_or_else(|_| PathBuf::from("."));
+    resource_dir.join("character-cards")
+}
+
+#[tauri::command]
+pub async fn list_bundled_cards(app: AppHandle) -> Result<Vec<CharacterCardFile>, String> {
+    let app_clone = app.clone();
+    tokio::task::spawn_blocking(move || {
+        let base_dir = get_bundled_cards_dir(&app_clone);
+        if !base_dir.exists() {
+            return Ok(Vec::new());
+        }
+
+        let mut result = Vec::new();
+        let category_entries = fs::read_dir(&base_dir).map_err(|e| e.to_string())?;
+
+        for cat_entry in category_entries {
+            let cat_entry = match cat_entry {
+                Ok(v) => v,
+                Err(_) => continue,
+            };
+            if !cat_entry.file_type().map(|t| t.is_dir()).unwrap_or(false) {
+                continue;
+            }
+            let category = match cat_entry.file_name().into_string() {
+                Ok(s) => s,
+                Err(_) => continue,
+            };
+            let cat_path = cat_entry.path();
+            let card_entries = match fs::read_dir(&cat_path) {
+                Ok(v) => v,
+                Err(_) => continue,
+            };
+
+            for card_entry in card_entries {
+                let card_entry = match card_entry {
+                    Ok(v) => v,
+                    Err(_) => continue,
+                };
+                if !card_entry.file_type().map(|t| t.is_file()).unwrap_or(false) {
+                    continue;
+                }
+                let path = card_entry.path();
+                let ext_ok = path
+                    .extension()
+                    .and_then(|s| s.to_str())
+                    .map(|s| s.eq_ignore_ascii_case("png") || s.eq_ignore_ascii_case("webp"))
+                    .unwrap_or(false);
+                if !ext_ok {
+                    continue;
+                }
+                let file_name = match path.file_name().and_then(|s| s.to_str()) {
+                    Some(v) => v.to_string(),
+                    None => continue,
+                };
+                let meta = match card_entry.metadata() {
+                    Ok(v) => v,
+                    Err(_) => continue,
+                };
+
+                result.push(CharacterCardFile {
+                    file_name,
+                    size: meta.len(),
+                    modified_ms: None,
+                    category: Some(category.clone()),
+                });
+            }
+        }
+
+        result.sort_by(|a, b| a.file_name.to_lowercase().cmp(&b.file_name.to_lowercase()));
+        Ok(result)
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
+pub async fn read_bundled_card_thumb(
+    app: AppHandle,
+    category: String,
+    file_name: String,
+) -> Result<Vec<u8>, String> {
+    if file_name.trim().is_empty() || category.trim().is_empty() {
+        return Err("参数不能为空".to_string());
+    }
+    if file_name.contains("..") || file_name.contains('/') || file_name.contains('\\') {
+        return Err("文件名不合法".to_string());
+    }
+    if category.contains("..") || category.contains('/') || category.contains('\\') {
+        return Err("分类名不合法".to_string());
+    }
+
+    let app_clone = app.clone();
+    tokio::task::spawn_blocking(move || {
+        let dir = get_bundled_cards_dir(&app_clone);
+        let file_path = dir.join(&category).join(&file_name);
+        if !file_path.exists() {
+            return Err("文件不存在".to_string());
+        }
+        fs::read(&file_path).map_err(|e| e.to_string())
+    })
+    .await
+    .map_err(|e| e.to_string())?
+}
+
+#[tauri::command]
+pub async fn import_bundled_card(
+    app: AppHandle,
+    category: String,
+    file_name: String,
+) -> Result<(), String> {
+    if file_name.trim().is_empty() || category.trim().is_empty() {
+        return Err("参数不能为空".to_string());
+    }
+    if file_name.contains("..") || file_name.contains('/') || file_name.contains('\\') {
+        return Err("文件名不合法".to_string());
+    }
+    if category.contains("..") || category.contains('/') || category.contains('\\') {
+        return Err("分类名不合法".to_string());
+    }
+
+    let app_clone = app.clone();
+    tokio::task::spawn_blocking(move || {
+        let bundled_dir = get_bundled_cards_dir(&app_clone);
+        let source_path = bundled_dir.join(&category).join(&file_name);
+        if !source_path.exists() {
+            return Err("预设文件不存在".to_string());
+        }
+
+        let target_dir = get_character_cards_dir(&app_clone);
+        if !target_dir.exists() {
+            fs::create_dir_all(&target_dir).map_err(|e| format!("创建目录失败: {}", e))?;
+        }
+
+        let target_path = target_dir.join(&file_name);
+        if target_path.exists() {
+            return Err("同名角色卡已存在".to_string());
+        }
+
+        fs::copy(&source_path, &target_path).map_err(|e| format!("复制失败: {}", e))?;
         Ok(())
     })
     .await

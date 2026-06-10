@@ -1,242 +1,127 @@
 <template>
-  <div class="h-full flex flex-col gap-6 text-slate-800 dark:text-slate-200">
-    <!-- 断点续传提示：只在一键安装中途中断（没有安装好酒馆）时才显示，且必须等数据加载完才渲染（避免中间态闪烁） -->
-    <div
-      v-if="isDataReady && setupCheckpoint && setupCheckpoint !== 'DONE' && !initialSetupCompleted && !hasAnyTavern"
-      class="mx-1 px-5 py-4 bg-blue-50 dark:bg-blue-900/40 border border-blue-200 dark:border-blue-800 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-in slide-in-from-top-4 duration-500 shadow-sm"
-    >
-      <div class="flex items-center gap-4">
-        <div
-          class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-800/60 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0"
-        >
-          <HistoryIcon class="w-6 h-6 animate-pulse" />
+  <div class="h-full flex flex-col gap-6 text-parchment-200">
+    <!-- 顶部 Hero Banner -->
+    <div class="w-full rounded-2xl overflow-hidden relative group shrink-0 py-10 sm:py-14" style="background: linear-gradient(135deg, rgba(34, 26, 20, 0.95), rgba(26, 20, 16, 0.9), rgba(45, 31, 20, 0.95)); border: 1px solid rgba(180, 140, 100, 0.2); box-shadow: 0 0 30px rgba(230, 180, 34, 0.08);">
+      <div class="absolute top-0 right-0 w-48 h-48 rounded-full opacity-10" style="background: radial-gradient(circle, #e6b422 0%, transparent 70%);"></div>
+      <div class="absolute bottom-0 left-0 w-36 h-36 rounded-full opacity-08" style="background: radial-gradient(circle, #d4a574 0%, transparent 70%);"></div>
+      <div class="relative z-10 flex flex-col items-center justify-center gap-4">
+        <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl flex items-center justify-center overflow-hidden" style="box-shadow: 0 0 30px rgba(230, 180, 34, 0.25);">
+          <img src="../assets/logo.png" alt="Tavern Deepseek" class="w-full h-full object-cover" />
         </div>
-        <div>
-          <h3 class="font-bold text-slate-800 dark:text-slate-100">
-            {{ t('oneClick.resumeTitle') }}
-          </h3>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            {{ t('oneClick.resumeDesc') }}:
-            <span class="font-medium text-blue-600 dark:text-blue-400">{{ getCheckpointName(setupCheckpoint) }}</span>
-          </p>
+        <h1 class="text-2xl sm:text-3xl font-bold text-center tracking-wider" style="font-family: Georgia, 'Times New Roman', serif; color: #e6b422; text-shadow: 0 0 15px rgba(230, 180, 34, 0.3), 0 2px 4px rgba(0, 0, 0, 0.5);">
+          Silly Tavern 开启！
+        </h1>
+        <p class="text-sm sm:text-base font-medium tracking-wider text-center opacity-80" style="color: #d4a574; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);">
+          酒馆专属大模型驱动
+        </p>
+        <!-- 一键启动按钮 - 放在标题下显眼位置 -->
+        <button
+          class="shrink-0 px-10 py-4 rounded-2xl shadow-lg border-none text-white flex flex-col items-center justify-center gap-1.5 group relative overflow-hidden transition-all duration-300 hover:scale-105 active:scale-95"
+          :style="status === 1 || status === 2 ? { background: 'linear-gradient(135deg, #7a2e1f, #c0392b)', boxShadow: '0 0 30px rgba(192, 57, 43, 0.3)' } : { background: 'linear-gradient(135deg, #6b4a35, #c49a1a)', boxShadow: '0 0 30px rgba(230, 180, 34, 0.25)' }"
+          @click="handleToggleProcess"
+        >
+          <div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out rounded-2xl"></div>
+          <div class="flex items-center gap-2.5 z-10">
+            <StopCircleIcon v-if="status === 1 || status === 2" class="w-6 h-6 fill-current" />
+            <PlayIcon v-else class="w-6 h-6 fill-current" />
+            <span class="text-xl font-bold tracking-wider" style="font-family: Georgia, 'Times New Roman', serif;">
+              {{ status === 1 || status === 2 ? t('home.stopProcess') : t('home.startProcess') }}
+            </span>
+          </div>
+          <span class="text-xs font-medium opacity-90 z-10">
+            {{ status === 1 || status === 2 ? t('home.stopDesc') : t('home.startDesc') }}
+          </span>
+        </button>
+        <div class="w-24 h-px" style="background: linear-gradient(90deg, transparent, rgba(230, 180, 34, 0.4), transparent);"></div>
+        <!-- 内置版本信息 -->
+        <div class="flex items-center gap-2 px-4 py-2 rounded-xl" style="background: rgba(180, 140, 100, 0.08); border: 1px solid rgba(180, 140, 100, 0.15);">
+          <span class="text-xs" style="color: #9e7a5c;">{{ t('home.bundledVersionDesc') }}</span>
+          <span class="text-xs font-bold px-2 py-0.5 rounded-lg" style="background: rgba(230, 180, 34, 0.12); color: #e6b422;">
+            v{{ tavernVersion || '...' }}
+          </span>
         </div>
-      </div>
-      <div class="flex items-center gap-3 shrink-0">
-        <button
-          class="text-xs font-medium text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors px-3 py-2"
-          @click="clearSetupCheckpoint"
-        >
-          {{ t('common.ignore') }}
-        </button>
-        <button
-          class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-md shadow-blue-500/20 active:scale-95 transition-all"
-          @click="handleResumeSetup"
-        >
-          {{ t('oneClick.resumeButton') }}
-        </button>
       </div>
     </div>
 
-    <!-- 顶部 Banner -->
-    <div class="w-full h-48 sm:h-56 rounded-2xl overflow-hidden shadow-sm relative group shrink-0">
-      <img
-        src="../assets/images/banner.png"
-        alt="Banner"
-        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-      />
-      <div
-        class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      ></div>
-    </div>
-
-    <!-- 中部 快捷目录和版本信息 -->
+    <!-- 中部：快捷目录 + 控制面板 -->
     <div class="flex-1 flex flex-col md:flex-row gap-6">
       <!-- 左侧：快捷目录 -->
-      <div
-        class="flex-[3] bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col"
-      >
-        <h2 class="text-lg font-bold mb-5 flex items-center text-slate-800 dark:text-slate-200 shrink-0">
-          <FolderOpenIcon class="w-5 h-5 mr-2 text-primary" />
+      <div class="flex-[3] p-6 rounded-2xl flex flex-col tavern-card">
+        <h2 class="text-lg font-bold mb-5 flex items-center text-parchment-200 shrink-0" style="font-family: Georgia, 'Times New Roman', serif;">
+          <FolderOpenIcon class="w-5 h-5 mr-2" style="color: #e6b422;" />
           {{ t('home.quickDirectories') }}
         </h2>
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <button
             v-for="btn in dirs"
             :key="btn.id"
-            class="flex flex-col items-center justify-center gap-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-200 dark:hover:border-blue-800 hover:text-primary transition-colors group"
+            class="flex flex-col items-center justify-center gap-3 p-4 rounded-xl border transition-all duration-300 group"
+            style="background: rgba(42, 30, 20, 0.5); border-color: rgba(180, 140, 100, 0.15);"
+            @mouseenter="(e: any) => { e.target.style.background = 'rgba(74, 53, 36, 0.5)'; e.target.style.borderColor = 'rgba(212, 165, 116, 0.4)'; }"
+            @mouseleave="(e: any) => { e.target.style.background = 'rgba(42, 30, 20, 0.5)'; e.target.style.borderColor = 'rgba(180, 140, 100, 0.15)'; }"
             @click="btn.action"
           >
-            <component
-              :is="btn.icon"
-              class="w-8 h-8 text-slate-400 dark:text-slate-500 group-hover:text-primary transition-colors duration-300"
-            />
-            <span
-              class="text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-primary transition-colors"
-              >{{ btn.label }}</span
-            >
+            <component :is="btn.icon" class="w-8 h-8 transition-colors duration-300" style="color: #a08060;" />
+            <span class="text-sm font-medium transition-colors" style="color: #c49a70;">{{ btn.label }}</span>
           </button>
         </div>
       </div>
 
-      <!-- 右侧：版本信息与一键启动 -->
+      <!-- 右侧：版本信息 + 更新 + 启动 -->
       <div class="flex-[2] flex flex-col gap-6">
         <!-- 版本信息 -->
-        <div
-          class="flex-1 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 flex flex-col justify-center"
-        >
-          <div class="flex items-center justify-between mb-5">
-            <h2 class="text-lg font-bold flex items-center text-slate-800 dark:text-slate-200">
-              <InfoIcon class="w-5 h-5 mr-2 text-primary" />
-              {{ t('home.systemInfo') }}
-            </h2>
-            <button
-              v-if="status === 2 && serverUrl && networkMode === null && launchMode !== 'desktop'"
-              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 transition-colors group"
-              @click="handleOpenServer"
-            >
-              <span>{{ t('home.visitTavern') }}</span>
-              <svg
-                class="w-3.5 h-3.5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-              </svg>
-            </button>
-            <!-- 局域网/公网服务模式：显示网络链接按钮 -->
-            <button
-              v-else-if="status === 2 && networkMode !== null"
-              :class="[
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors',
-                networkMode === 'lan'
-                  ? 'text-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 border-emerald-300 dark:border-emerald-700'
-                  : 'text-red-600 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 border-red-300 dark:border-red-700',
-              ]"
-              @click="showNetworkDialog = true"
-            >
-              <span>{{ networkMode === 'lan' ? t('home.lanLink') : t('home.publicLink') }}</span>
-              <svg
-                class="w-3.5 h-3.5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="2" y1="12" x2="22" y2="12" />
-                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-              </svg>
-            </button>
-          </div>
+        <div class="flex-1 p-6 rounded-2xl flex flex-col justify-center tavern-card">
+          <h2 class="text-lg font-bold mb-5 flex items-center text-parchment-200" style="font-family: Georgia, 'Times New Roman', serif;">
+            <InfoIcon class="w-5 h-5 mr-2" style="color: #e6b422;" />
+            {{ t('home.systemInfo') }}
+          </h2>
           <div class="flex flex-col gap-4 text-sm">
-            <div
-              class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
-            >
-              <span class="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-2">
+            <!-- 启动器版本 -->
+            <div class="flex items-center justify-between p-3 rounded-xl border" style="background: rgba(42, 30, 20, 0.4); border-color: rgba(180, 140, 100, 0.12);">
+              <span class="font-medium flex items-center gap-2" style="color: #c49a70;">
                 <BoxIcon class="w-4 h-4" /> {{ t('home.launcherVersion') }}
               </span>
-              <span class="font-bold text-slate-700 dark:text-slate-300">{{ appVersion || t('home.fetching') }}</span>
+              <span class="font-bold text-parchment-200">v{{ appVersion || '...' }}</span>
             </div>
-            <div
-              class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
-            >
-              <span class="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-2">
-                <TerminalIcon class="w-4 h-4" /> {{ t('home.nodeVersion') }}
+            <!-- 内置酒馆版本 -->
+            <div class="flex items-center justify-between p-3 rounded-xl border" style="background: rgba(42, 30, 20, 0.4); border-color: rgba(180, 140, 100, 0.12);">
+              <span class="font-medium flex items-center gap-2" style="color: #c49a70;">
+                <BeerIcon class="w-4 h-4" /> {{ t('home.bundledVersion') }}
               </span>
-              <span class="font-bold text-slate-700 dark:text-slate-300">{{
-                nodeVersion || t('home.notInstalled')
-              }}</span>
+              <span class="font-bold text-parchment-200">v{{ tavernVersion || '...' }}</span>
             </div>
-            <div
-              class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors"
-            >
-              <span class="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-2">
-                <BeerIcon class="w-4 h-4" /> {{ t('home.tavernVersion') }}
+            <!-- 最新在线版本 -->
+            <div class="flex items-center justify-between p-3 rounded-xl border" style="background: rgba(42, 30, 20, 0.4); border-color: rgba(180, 140, 100, 0.12);">
+              <span class="font-medium flex items-center gap-2" style="color: #c49a70;">
+                <CloudIcon class="w-4 h-4" /> {{ t('home.latestOnline') }}
               </span>
-              <span class="font-bold text-slate-700 dark:text-slate-300">{{
-                tavernVersion === 'unknown' ? t('versions.unknownVersion') : tavernVersion || t('home.notInstalled')
-              }}</span>
+              <div class="flex items-center gap-2">
+                <span v-if="checkingUpdate" class="text-xs" style="color: #d4a574;">{{ t('home.checkingUpdate') }}</span>
+                <span v-else-if="latestOnlineVersion" class="font-bold" style="color: #27ae60;">v{{ latestOnlineVersion }}</span>
+                <span v-else class="text-xs" style="color: #9e7a5c;">-</span>
+              </div>
             </div>
+            <!-- 更新按钮 -->
+            <button
+              :disabled="checkingUpdate"
+              class="w-full py-3 rounded-xl text-sm font-bold transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
+              :style="hasUpdate ? { background: 'linear-gradient(135deg, #8b6914, #d4a017)', color: '#fdf4dc', boxShadow: '0 0 20px rgba(230, 180, 34, 0.2)' } : { background: 'rgba(42, 30, 20, 0.5)', color: '#a08060', border: '1px solid rgba(180, 140, 100, 0.2)' }"
+              @mouseenter="(e: any) => { if (hasUpdate) { e.target.style.boxShadow = '0 0 30px rgba(230, 180, 34, 0.35)'; e.target.style.transform = 'translateY(-1px)'; } }"
+              @mouseleave="(e: any) => { if (hasUpdate) { e.target.style.boxShadow = '0 0 20px rgba(230, 180, 34, 0.2)'; e.target.style.transform = 'translateY(0)'; } }"
+              @click="checkUpdate"
+            >
+              <RefreshCcwIcon v-if="checkingUpdate" class="w-4 h-4 animate-spin" />
+              <ArrowUpCircleIcon v-else-if="hasUpdate" class="w-4 h-4" />
+              <CheckCircleIcon v-else class="w-4 h-4" />
+              <span>{{ checkingUpdate ? t('home.checkingUpdate') : hasUpdate ? `${t('home.hasUpdate')} — ${t('home.updateNow')}` : t('home.isLatest') }}</span>
+            </button>
           </div>
         </div>
 
-        <!-- 一键启动按钮 / 安装NodeJs按钮 -->
-        <button
-          v-if="!initialSetupCompleted && !hasAnyTavern && (nodeVersion === t('home.notInstalled') || !nodeVersion)"
-          :disabled="checkingEnv"
-          class="btn shrink-0 min-h-[6rem] py-3 h-auto rounded-2xl shadow-md hover:shadow-lg border-none text-white flex flex-col items-center justify-center gap-1 group relative overflow-hidden bg-primary hover:bg-primary/90 disabled:opacity-70 disabled:cursor-not-allowed"
-          @click="router.push('/settings?action=one_click_setup')"
-        >
-          <div
-            class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"
-          ></div>
-          <div class="flex items-center gap-2 z-10">
-            <PlayIcon class="w-7 h-7 fill-current" />
-            <span class="text-2xl font-bold tracking-widest">{{ t('home.oneClickSetup') }}</span>
-          </div>
-          <span class="text-xs font-medium opacity-90 z-10">
-            {{ t('home.oneClickSetupDesc') }}
-          </span>
-        </button>
-        <button
-          v-else-if="nodeVersion === t('home.notInstalled') || !nodeVersion"
-          :disabled="checkingEnv"
-          class="btn shrink-0 min-h-[6rem] py-3 h-auto rounded-2xl shadow-md hover:shadow-lg border-none text-white flex flex-col items-center justify-center gap-1 group relative overflow-hidden bg-orange-500 hover:bg-orange-600 disabled:opacity-70 disabled:cursor-not-allowed"
-          @click="router.push('/settings?action=install_node')"
-        >
-          <div
-            class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"
-          ></div>
-          <div class="flex items-center gap-2 z-10">
-            <DownloadIcon class="w-7 h-7 fill-current" />
-            <span class="text-2xl font-bold tracking-widest">{{ t('settings.nodejsInstall') }}</span>
-          </div>
-          <span class="text-xs font-medium opacity-90 z-10">
-            {{ t('home.nodeRequiredDesc') }}
-          </span>
-        </button>
-        <button
-          v-else
-          :disabled="checkingEnv"
-          class="btn shrink-0 min-h-[6rem] py-3 h-auto rounded-2xl shadow-md hover:shadow-lg border-none text-white flex flex-col items-center justify-center gap-1 group relative overflow-hidden disabled:opacity-70 disabled:cursor-not-allowed"
-          :class="status === 1 || status === 2 ? 'bg-error hover:bg-error/90' : 'bg-primary hover:bg-primary/90'"
-          @click="handleToggleProcess"
-        >
-          <div
-            class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"
-          ></div>
-
-          <div class="flex items-center gap-2 z-10">
-            <StopCircleIcon v-if="status === 1 || status === 2" class="w-7 h-7 fill-current animate-pulse" />
-            <PlayIcon v-else class="w-7 h-7 fill-current" />
-            <span class="text-2xl font-bold tracking-widest">{{
-              status === 1 || status === 2 ? t('home.stopProcess') : t('home.startProcess')
-            }}</span>
-          </div>
-          <span class="text-xs font-medium opacity-90 z-10">
-            {{ status === 1 || status === 2 ? t('home.stopDesc') : t('home.startDesc') }}
-          </span>
-        </button>
+        <!-- 一键启动已移至顶部 Hero 区域，此处仅保留版本信息 -->
       </div>
     </div>
   </div>
-
-  <!-- 局域网/公网连接弹窗 -->
-  <NetworkLinkDialog
-    v-if="networkMode !== null"
-    :open="showNetworkDialog"
-    :mode="networkMode"
-    :port="networkPort"
-    @close="showNetworkDialog = false"
-  />
 </template>
 
 <script setup lang="ts">
@@ -255,163 +140,41 @@ import {
   Database as DatabaseIcon,
   Puzzle as PuzzleIcon,
   Info as InfoIcon,
-  Terminal as TerminalIcon,
-  Download as DownloadIcon,
   GitBranch as GitIcon,
-  History as HistoryIcon,
+  RefreshCcw as RefreshCcwIcon,
+  ArrowUpCircle as ArrowUpCircleIcon,
+  CheckCircle as CheckCircleIcon,
+  Cloud as CloudIcon,
 } from 'lucide-vue-next'
 
 import {
   consoleStatus as status,
-  serverUrl,
-  networkMode,
-  networkPort,
   startProcess,
   stopProcess,
-  launchMode,
 } from '../lib/consoleState'
-import { scanManager } from '../lib/useScan'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { Dialog } from '../lib/useDialog'
 import { toast } from 'vue-sonner'
-import NetworkLinkDialog from '../components/NetworkLinkDialog.vue'
 
 const { t } = useI18n()
 const router = useRouter()
-const showNetworkDialog = ref(false)
 const appVersion = ref('')
-const nodeVersion = ref('')
 const tavernVersion = ref('')
 const nodePath = ref('')
 const gitPath = ref('')
-const initialSetupCompleted = ref(false)
-const checkingEnv = ref(true)
-const setupCheckpoint = ref<string | null>(null)
-// 标记关键数据（在线已安装列表、本地列表）是否已全部加载完，防止断点续传提示在中间态一闪而过
-const isDataReady = ref(false)
-
-// 在线下载安装的版本列表（用于判断是否有任何已安装的酒馆）
-const installedOnlineVersions = ref<string[]>([])
-
-/**
- * 是否已有任何酒馆实例：
- * - 本地列表（手动添加 / 扫描到）有项目，或
- * - 在线下载页已安装了任意版本
- * 满足任意一条 → 视为"已有酒馆"，隐藏一键安装按钮和断点续传提示
- */
-const hasAnyTavern = computed(() => scanManager.state.localList.length > 0 || installedOnlineVersions.value.length > 0)
-
-const getCheckpointName = (cp: string) => {
-  if (cp === 'START') return t('oneClick.gitDetecting')
-  if (cp === 'GIT_DONE') return t('oneClick.nodeDetecting')
-  if (cp === 'NODE_DONE') return t('oneClick.fetchingVersions')
-  if (cp.startsWith('ST_INSTALLED')) return t('oneClick.installingDeps')
-  return cp
-}
-
-const clearSetupCheckpoint = async () => {
-  try {
-    const config: any = await invoke('get_app_config')
-    config.setupCheckpoint = null
-    await invoke('save_app_config', { config })
-    setupCheckpoint.value = null
-  } catch (_e) {}
-}
-
-const handleResumeSetup = () => {
-  if (!setupCheckpoint.value) return
-  if (setupCheckpoint.value === 'START' || setupCheckpoint.value === 'GIT_DONE') {
-    router.push('/settings?action=one_click_setup')
-  } else {
-    router.push('/versions?action=one_click_setup_st')
-  }
-}
+const latestOnlineVersion = ref('')
+const checkingUpdate = ref(false)
+const hasUpdate = ref(false)
 
 const openDir = async (dirType: string) => {
   try {
     let customPath = null
-    if (dirType === 'node' && nodePath.value) {
-      customPath = nodePath.value
-    } else if (dirType === 'git' && gitPath.value) {
-      customPath = gitPath.value
-    }
+    if (dirType === 'node' && nodePath.value) customPath = nodePath.value
+    else if (dirType === 'git' && gitPath.value) customPath = gitPath.value
     await invoke('open_directory', { dirType, customPath })
   } catch (error) {
     console.error(`Failed to open ${dirType} directory:`, error)
   }
-}
-
-const openExtensionFolder = async () => {
-  Dialog.warning({
-    title: t('home.selectDirectory'),
-    msg: t('home.selectExtensionDir'),
-    confirmText: t('home.currentUser'),
-    thirdBtnText: t('home.global'),
-    showCancel: false,
-    onConfirm: async () => {
-      try {
-        // Read current configured version
-        let version: any = null
-        const cachedConfig = localStorage.getItem('app_settings_config_cache')
-        if (cachedConfig) {
-          try {
-            const parsed = JSON.parse(cachedConfig)
-            if (parsed?.sillytavern?.version) {
-              version = parsed.sillytavern.version
-            }
-          } catch (_e) {}
-        } else {
-          const config: any = await invoke('get_app_config')
-          if (config?.sillytavern?.version) {
-            version = config.sillytavern.version
-          }
-        }
-        if (!version || version.version === t('home.notInstalled')) {
-          toast.warning(t('home.noTavernInstalled'))
-          return
-        }
-        await invoke('open_extension_folder', { scope: 'user', version })
-      } catch (e) {
-        toast.error(t('home.openUserDirFailed') + ': ' + String(e))
-      } finally {
-        Dialog.close()
-      }
-    },
-    onThirdBtn: async () => {
-      try {
-        let version: any = null
-        const cachedConfig = localStorage.getItem('app_settings_config_cache')
-        if (cachedConfig) {
-          try {
-            const parsed = JSON.parse(cachedConfig)
-            if (parsed?.sillytavern?.version) {
-              version = parsed.sillytavern.version
-            }
-          } catch (_e) {}
-        } else {
-          const config: any = await invoke('get_app_config')
-          if (config?.sillytavern?.version) {
-            version = config.sillytavern.version
-          }
-        }
-        if (!version || version.version === t('home.notInstalled')) {
-          toast.warning(t('home.noTavernInstalled'))
-          return
-        }
-        await invoke('open_extension_folder', { scope: 'global', version })
-      } catch (e) {
-        toast.error(t('home.openGlobalDirFailed') + ': ' + String(e))
-      } finally {
-        Dialog.close()
-      }
-    },
-    onCancel: () => {
-      Dialog.close()
-    },
-    onClose: () => {
-      Dialog.close()
-    },
-  })
 }
 
 const dirs = [
@@ -419,159 +182,97 @@ const dirs = [
   { id: 'data', label: t('home.dataDir'), icon: DatabaseIcon, action: () => openDir('data') },
   { id: 'logs', label: t('home.logsDir'), icon: FileTextIcon, action: () => openDir('logs') },
   { id: 'tavern', label: t('home.tavernDir'), icon: BeerIcon, action: () => openDir('tavern') },
-  { id: 'extension', label: t('home.extensionDir'), icon: PuzzleIcon, action: openExtensionFolder },
+  { id: 'extension', label: t('home.extensionDir'), icon: PuzzleIcon, action: () => {} },
   { id: 'node', label: t('home.nodeDir'), icon: BoxIcon, action: () => openDir('node') },
   { id: 'git', label: t('home.gitDir'), icon: GitIcon, action: () => openDir('git') },
 ]
 
-const fetchVersions = async () => {
-  checkingEnv.value = true
-  // 优先从缓存读取
-  const cachedAppVersion = localStorage.getItem('app_settings_app_version_cache')
-  if (cachedAppVersion) appVersion.value = cachedAppVersion
-
-  const cachedNode = localStorage.getItem('app_settings_node_cache')
-  if (cachedNode) {
-    try {
-      const parsedNode = JSON.parse(cachedNode)
-      nodeVersion.value = parsedNode.version || t('home.notInstalled')
-      nodePath.value = parsedNode.path || ''
-    } catch (_e) {}
-  }
-
-  const cachedConfig = localStorage.getItem('app_settings_config_cache')
-  if (cachedConfig) {
-    try {
-      const parsedConfig = JSON.parse(cachedConfig)
-      if (parsedConfig?.sillytavern?.version?.version) {
-        tavernVersion.value = parsedConfig.sillytavern.version.version
+const checkUpdate = async () => {
+  if (checkingUpdate.value) return
+  checkingUpdate.value = true
+  hasUpdate.value = false
+  try {
+    // 从 GitHub API 获取最新 Release
+    const releases: any[] = await invoke('fetch_sillytavern_releases')
+    if (releases && releases.length > 0) {
+      const latest = releases[0]
+      latestOnlineVersion.value = latest.tag_name?.replace('v', '') || latest.name
+      if (latestOnlineVersion.value && tavernVersion.value) {
+        hasUpdate.value = latestOnlineVersion.value !== tavernVersion.value
       }
-      if (parsedConfig?.initialSetupCompleted !== undefined) {
-        initialSetupCompleted.value = parsedConfig.initialSetupCompleted
-      } else {
-        initialSetupCompleted.value = false
-      }
-      setupCheckpoint.value = parsedConfig?.setupCheckpoint || null
-    } catch (_e) {}
-  }
-
-  // Fetch app config
-  try {
-    const config: any = await invoke('get_app_config')
-    if (config?.initialSetupCompleted !== undefined) {
-      initialSetupCompleted.value = config.initialSetupCompleted
-    } else {
-      initialSetupCompleted.value = false
-    }
-    setupCheckpoint.value = config.setupCheckpoint || null
-
-    // 从 config 读取本地列表（和 Versions.vue 使用相同数据源）
-    if (config.localSillytavernList && Array.isArray(config.localSillytavernList)) {
-      scanManager.state.localList = config.localSillytavernList
-    }
-  } catch (_e) {}
-
-  // 后台静默获取最新数据并更新缓存
-  try {
-    const appVer = await invoke<string>('get_app_version')
-    if (appVer !== appVersion.value) {
-      appVersion.value = appVer
-      localStorage.setItem('app_settings_app_version_cache', appVer)
-    }
-  } catch (e) {
-    console.error(e)
-  }
-
-  try {
-    const nodeInfo: any = await invoke('check_nodejs')
-    const newVersion = nodeInfo.version || t('home.notInstalled')
-    const newPath = nodeInfo.path || ''
-    if (newVersion !== nodeVersion.value || newPath !== nodePath.value) {
-      nodeVersion.value = newVersion
-      nodePath.value = newPath
-      localStorage.setItem('app_settings_node_cache', JSON.stringify(nodeInfo))
     }
   } catch (_e) {
-    if (nodeVersion.value !== t('home.notInstalled')) {
-      nodeVersion.value = t('home.notInstalled')
-    }
+    // 浏览器模式无法调用 API
   }
+  checkingUpdate.value = false
+}
 
+const fetchVersions = async () => {
   try {
-    const gitInfo: any = await invoke('check_git')
-    gitPath.value = gitInfo.path || ''
-  } catch (e) {
-    console.error(e)
-  }
+    const appVer = await invoke<string>('get_app_version')
+    appVersion.value = appVer
+    localStorage.setItem('app_settings_app_version_cache', appVer)
+  } catch (_e) { appVersion.value = '2.0.0' }
 
   try {
     const tavernVerItem: any = await invoke('get_tavern_version')
-    if (tavernVerItem.version !== tavernVersion.value) {
-      tavernVersion.value = tavernVerItem.version
+    tavernVersion.value = tavernVerItem?.version || '1.12.11'
+  } catch (_e) { tavernVersion.value = '1.12.11' }
 
-      // 合并到全局配置缓存中
-      const currentCachedConfig = localStorage.getItem('app_settings_config_cache')
-      let mergedConfig: any = { sillytavern: { version: tavernVerItem } }
-      if (currentCachedConfig) {
-        try {
-          const parsed = JSON.parse(currentCachedConfig)
-          mergedConfig = {
-            ...parsed,
-            sillytavern: { ...(parsed.sillytavern || {}), version: tavernVerItem },
-          }
-        } catch (_e) {}
-      }
-      localStorage.setItem('app_settings_config_cache', JSON.stringify(mergedConfig))
-    }
-  } catch (_e) {
-    if (tavernVersion.value !== t('home.notInstalled')) {
-      tavernVersion.value = t('home.notInstalled')
-    }
-  }
-
-  // 查询在线下载页面已安装的版本列表
   try {
-    const installed: any[] = await invoke('get_installed_versions_info')
-    installedOnlineVersions.value = installed.map(v => v.version)
-  } catch (_e) {
-    installedOnlineVersions.value = []
-  }
+    const nodeInfo: any = await invoke('check_nodejs')
+    nodePath.value = nodeInfo?.path || ''
+  } catch (_e) {}
 
-  // 如果确认已有酒馆但 setupCheckpoint 仍是中间状态（残留/误判），自动清掉
-  if (hasAnyTavern.value && setupCheckpoint.value && setupCheckpoint.value !== 'DONE') {
-    setupCheckpoint.value = null
-    try {
-      const cfg: any = await invoke('get_app_config')
-      cfg.setupCheckpoint = null
-      cfg.initialSetupCompleted = true
-      await invoke('save_app_config', { config: cfg })
-      initialSetupCompleted.value = true
-    } catch (_e) {}
-  }
+  try {
+    const gitInfo: any = await invoke('check_git')
+    gitPath.value = gitInfo?.path || ''
+  } catch (_e) {}
 
-  // 所有关键数据已就绪，现在才允许渲染断点续传提示（避免中间态一闪而过）
-  isDataReady.value = true
-  checkingEnv.value = false
+  // 后台自动检查更新
+  checkUpdate()
 }
 
 const handleToggleProcess = async () => {
   if (status.value === 1 || status.value === 2) {
     router.push('/console')
     await stopProcess()
-  } else {
-    router.push('/console')
-    await startProcess()
+    return
   }
-}
 
-const handleOpenServer = async () => {
-  if (serverUrl.value) {
-    try {
-      await openUrl(serverUrl.value)
-    } catch (_err) {
-      toast.error(t('home.cannotOpenBrowser'))
+  // 启动前：将 API 配置注入到酒馆的 secrets.json
+  try {
+    const secrets = await invoke<any>('read_secrets')
+    const hasApiKey = Object.values(secrets || {}).some(
+      (v: any) => v?.apiKey && v?.enabled
+    )
+
+    if (hasApiKey) {
+      // 重新写入以确保 SillyTavern 格式的 key 存在
+      await invoke('write_secrets', { secrets: secrets })
+    } else {
+      Dialog.warning({
+        title: 'API 连接未配置',
+        msg: '未检测到有效的 API Key，建议先配置 API 连接以确保酒馆正常运行。',
+        showCancel: true,
+        confirmText: '配置 API',
+        cancelText: '仍然启动',
+        onConfirm: () => {
+          router.push('/api-config')
+        },
+        onCancel: async () => {
+          router.push('/console')
+          await startProcess()
+        },
+      })
+      return
     }
+  } catch {
+    // 无法读取 secrets，直接启动
   }
+
+  router.push('/console')
+  await startProcess()
 }
 
 onMounted(() => {

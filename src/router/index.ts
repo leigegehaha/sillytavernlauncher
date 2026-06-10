@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import DeepSeek from '../views/DeepSeek.vue'
 import Home from '../views/Home.vue'
 import Tavern from '../views/Tavern.vue'
 import Versions from '../views/Versions.vue'
@@ -7,8 +8,14 @@ import Tools from '../views/Tools.vue'
 import Resources from '../views/Resources.vue'
 import Console from '../views/Console.vue'
 import Settings from '../views/Settings.vue'
+import ApiConfig from '../views/ApiConfig.vue'
 
 const routes = [
+  {
+    path: '/deepseek',
+    name: 'DeepSeek',
+    component: DeepSeek,
+  },
   {
     path: '/',
     name: 'Home',
@@ -48,6 +55,11 @@ const routes = [
     path: '/settings',
     name: 'Settings',
     component: Settings,
+  },
+  {
+    path: '/api-config',
+    name: 'ApiConfig',
+    component: ApiConfig,
   },
 ]
 

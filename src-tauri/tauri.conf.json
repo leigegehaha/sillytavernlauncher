@@ -1,19 +1,19 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "mainBinaryName": "sillytavern-launcher-gui",
-  "productName": "SillyTavern Launcher GUI",
-  "version": "1.0.8",
-  "identifier": "com.sillytavern-launcher-gui",
+  "mainBinaryName": "tavern-deepseek-launcher",
+  "productName": "Tavern Deepseek",
+  "version": "2.0.0",
+  "identifier": "com.tavern-deepseek-launcher",
   "build": {
-    "beforeDevCommand": "bun run dev",
+    "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
-    "beforeBuildCommand": "bun run build",
+    "beforeBuildCommand": "npx vite build",
     "frontendDist": "../dist"
   },
   "app": {
     "windows": [
       {
-        "title": "酒馆启动器",
+        "title": "Tavern Deepseek - 酒馆启动器",
         "width": 1200,
         "height": 800,
         "center": true,
@@ -42,8 +42,14 @@
     }
   },
   "bundle": {
-    "copyright": "Make by 灵狼AL01",
-    "publisher": "AL01.CN",
+    "resources": {
+      "resources/sillytavern-1.18.0": "sillytavern",
+      "resources/node-v22.12.0-darwin-arm64": "node-v22.12.0-darwin-arm64",
+      "resources/character-cards": "character-cards",
+      "resources/presets": "presets"
+    },
+    "copyright": "Tavern Deepseek by 磊哥哥 | Fork from SillyTavern Launcher by AL01.CN",
+    "publisher": "磊哥哥",
     "license": "MIT",
     "active": true,
     "createUpdaterArtifacts": true,
@@ -61,7 +67,7 @@
       },
       "nsis": {
         "installMode": "both",
-        "startMenuFolder": "SillyTavern Launcher GUI",
+        "startMenuFolder": "Tavern Deepseek",
         "installerIcon": "icons/icon.ico",
         "displayLanguageSelector": true,
         "installerHooks": "installer/hooks.nsh",

@@ -9,10 +9,13 @@ pub mod extensions;
 pub mod finderst;
 pub mod git;
 pub mod node;
+pub mod presets;
 pub mod sillytavern;
 pub mod types;
 pub mod utils;
 pub mod worldinfo;
+pub mod secrets;
+pub mod tavern_api;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 顶层 use
@@ -151,6 +154,80 @@ pub fn run() {
             init_logger(&path.join("data"));
             tracing::info!("应用启动");
 
+            // 自动配置内置酒馆和 Node.js
+            let handle = app.handle().clone();
+            let data_path = path.clone();
+            tauri::async_runtime::spawn(async move {
+                // 1. 自动配置内置 Node.js
+                let node_to = data_path.join("node");
+                let node_exe = if cfg!(target_os = "windows") {
+                    node_to.join("node.exe")
+                } else {
+                    node_to.join("bin").join("node")
+                };
+                if !node_exe.exists() {
+                    // 从资源目录复制内置 Node
+                    #[cfg(not(dev))]
+                    let resource_base = handle.path().resource_dir().unwrap_or_default();
+                    #[cfg(dev)]
+                    let resource_base = {
+                        let mut p = std::env::current_dir().unwrap_or_default();
+                        if !p.ends_with("src-tauri") { p.push("src-tauri"); }
+                        p.join("resources")
+                    };
+                    // 查找 node-v* 目录
+                    if let Ok(entries) = std::fs::read_dir(&resource_base) {
+                        for entry in entries.flatten() {
+                            let name = entry.file_name();
+                            let name_str = name.to_string_lossy();
+                            if name_str.starts_with("node-v") {
+                                let _ = std::fs::remove_dir_all(&node_to);
+                                // 递归复制
+                                fn copy_dir(src: &std::path::Path, dst: &std::path::Path) -> std::io::Result<()> {
+                                    std::fs::create_dir_all(dst)?;
+                                    for entry in std::fs::read_dir(src)? {
+                                        let entry = entry?;
+                                        let ty = entry.file_type()?;
+                                        let dst_path = dst.join(entry.file_name());
+                                        if ty.is_dir() {
+                                            copy_dir(&entry.path(), &dst_path)?;
+                                        } else {
+                                            std::fs::copy(entry.path(), &dst_path)?;
+                                        }
+                                    }
+                                    Ok(())
+                                }
+                                if copy_dir(&entry.path(), &node_to).is_ok() {
+                                    tracing::info!("已复制内置 Node.js 到数据目录");
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // 2. 自动配置内置酒馆
+                if let Ok(bundled_path) = sillytavern::get_bundled_tavern_path(handle.clone()) {
+                    let mut config = config::read_app_config_from_disk(&handle);
+                    let needs_update = config.sillytavern.version.version.is_empty()
+                        || !config.initial_setup_completed
+                        || config.sillytavern.version.path != bundled_path;
+                    if needs_update {
+                        config.sillytavern.version = crate::types::LocalTavernItem {
+                            version: "1.18.0".to_string(),
+                            path: bundled_path,
+                            has_node_modules: true,
+                        };
+                        if !config.initial_setup_completed {
+                            config.initial_setup_completed = true;
+                        }
+                        config.setup_checkpoint = Some("DONE".to_string());
+                        let _ = config::write_app_config_to_disk(&handle, &config);
+                        tracing::info!("已自动配置内置酒馆 v1.18.0, path: {}", config.sillytavern.version.path);
+                    }
+                }
+            });
+
             let handle = app.handle().clone();
             apply_saved_window_position(&handle);
             setup_window_position_tracking(&handle);
@@ -200,6 +277,7 @@ pub fn run() {
             git::install_git,
             git::cancel_git_node_install,
             // SillyTavern 版本管理
+            sillytavern::get_bundled_tavern_path,
             sillytavern::fetch_sillytavern_releases,
             sillytavern::get_installed_sillytavern_versions,
             sillytavern::get_installed_versions_info,
@@ -259,12 +337,49 @@ pub fn run() {
             character::import_character_card,
             character::read_local_file,
             character::import_character_card_from_bytes,
+            // 预设角色卡
+            character::list_bundled_cards,
+            character::read_bundled_card_thumb,
+            character::import_bundled_card,
+            // 预设资源
+            character::list_bundled_presets,
+            character::import_bundled_preset,
+            // secrets.json
+            secrets::read_secrets,
+            secrets::write_secrets,
+            secrets::test_api_connection,
+            secrets::fetch_model_list,
+            // 酒馆 API
+            tavern_api::tavern_register,
+            tavern_api::tavern_login,
+            tavern_api::tavern_send_verification_code,
+            tavern_api::tavern_get_self,
+            tavern_api::tavern_get_tokens,
+            tavern_api::tavern_create_token,
+            tavern_api::tavern_delete_token,
+            tavern_api::tavern_update_token_status,
+            tavern_api::tavern_get_token_by_name,
+            tavern_api::tavern_topup,
+            tavern_api::tavern_calc_amount,
+            tavern_api::tavern_create_payment,
+            tavern_api::tavern_get_models,
+            tavern_api::tavern_get_token_detail,
+            tavern_api::open_tavern_key_webview,
             // 世界书
             worldinfo::list_world_infos,
             worldinfo::read_world_info,
             worldinfo::delete_world_infos,
             worldinfo::import_world_info,
             worldinfo::import_world_info_from_bytes,
+            // 预设
+            presets::list_presets,
+            presets::import_preset_file,
+            presets::read_preset_file,
+            presets::delete_presets,
+            // 正则
+            presets::list_regex_scripts,
+            presets::import_regex_script,
+            presets::delete_regex_scripts,
             // 对话历史
             chat::list_chats,
             chat::read_chat,

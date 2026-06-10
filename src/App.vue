@@ -26,7 +26,11 @@ import { initDownloadProgressListener } from './lib/useNodeGitInstall'
 const { t } = useI18n()
 const router = useRouter()
 
+// 浏览器降级：非 Tauri 环境跳过原生 API
+const isTauri = !!(window as any).__TAURI_INTERNALS__
+
 onMounted(async () => {
+  if (!isTauri) return
   // 全局注册 Git/Node 下载进度监听（只注册一次，页面切换不会丢失进度）
   initDownloadProgressListener().catch(console.error)
 

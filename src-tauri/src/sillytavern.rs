@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 
 use futures_util::StreamExt;
 use tauri::{AppHandle, Emitter};
+use tauri::Manager;
 use tokio::io::AsyncBufReadExt;
 use tokio::io::BufReader;
 
@@ -23,6 +24,47 @@ use crate::types::{
     TavernThumbnailsConfig, TavernThumbnailsDimensionsConfig,
 };
 use crate::utils::get_config_path;
+
+// ─── 内置酒馆路径 ─────────────────────────────────────────────────────────
+
+/// 获取内置酒馆的路径
+/// - 生产模式：app.path().resource_dir()/sillytavern
+/// - 开发模式：项目根目录/src-tauri/resources/sillytavern-1.18.0
+#[tauri::command]
+pub fn get_bundled_tavern_path(app: AppHandle) -> Result<String, String> {
+    #[cfg(dev)]
+    {
+        let mut dev_path = std::env::current_dir()
+            .unwrap_or_else(|_| PathBuf::from("."));
+        // 可能以 src-tauri 结尾（cargo run from src-tauri）
+        if !dev_path.ends_with("src-tauri") {
+            dev_path.push("src-tauri");
+        }
+        let resources = dev_path.join("resources");
+        // 找到 sillytavern-* 目录
+        if let Ok(entries) = std::fs::read_dir(&resources) {
+            for entry in entries.flatten() {
+                let name = entry.file_name();
+                let name_str = name.to_string_lossy();
+                if name_str.starts_with("sillytavern-") {
+                    return Ok(entry.path().to_string_lossy().to_string());
+                }
+            }
+        }
+    }
+    
+    // 生产模式：从 Tauri resource_dir 读取
+    let resource_dir = app
+        .path()
+        .resource_dir()
+        .map_err(|e| format!("无法获取资源目录: {}", e))?;
+    let bundled = resource_dir.join("sillytavern");
+    if bundled.exists() {
+        return Ok(bundled.to_string_lossy().to_string());
+    }
+    
+    Err("未找到内置酒馆".to_string())
+}
 
 // ─── Git config 全局 URL 重写 ────────────────────────────────────────────────
 
@@ -3451,6 +3493,45 @@ pub async fn start_sillytavern(
     tracing::info!("SillyTavern dataRoot: {}", st_data_str);
     tracing::info!("SillyTavern configPath: {}", global_cfg_str);
     tracing::info!("SillyTavern global_cfg exists: {}", global_cfg.exists());
+
+    // ─── 启动前清理 settings.json 中可能残留的 flat keys ──────────────────
+    // 旧版 write_secrets 曾错误地将 main_api/chat_completion_source/custom_url/custom_model
+    // 写入 settings.json 顶层，这会覆盖 oai_settings 中的嵌套值，导致
+    // SillyTavern 初始化异常 → "Settings not ready" 无限循环
+    {
+        let settings_path = st_data.join("default-user").join("settings.json");
+        if settings_path.exists() {
+            if let Ok(content) = fs::read_to_string(&settings_path) {
+                if let Ok(mut settings) = serde_json::from_str::<serde_json::Map<String, serde_json::Value>>(&content) {
+                    let dirty_keys = ["chat_completion_source", "custom_url", "custom_model"];
+                    let mut cleaned = false;
+                    for k in &dirty_keys {
+                        if settings.contains_key(*k) && !settings[*k].is_object() {
+                            tracing::warn!("Cleaning corrupted flat key from settings.json: {}", k);
+                            settings.remove(*k);
+                            cleaned = true;
+                        }
+                    }
+                    // Fix main_api: "chat_completions" is not a valid value, should be "openai"
+                    if let Some(main_api) = settings.get("main_api") {
+                        if main_api.as_str() == Some("chat_completions") {
+                            tracing::warn!("Fixing main_api from 'chat_completions' to 'openai' in settings.json");
+                            settings.insert("main_api".to_string(), serde_json::Value::String("openai".to_string()));
+                            cleaned = true;
+                        }
+                    }
+                    if cleaned {
+                        if let Ok(new_content) = serde_json::to_string_pretty(&settings) {
+                            let _ = fs::write(&settings_path, new_content);
+                            tracing::info!("settings.json cleaned successfully");
+                        }
+                    }
+                }
+            }
+        } else {
+            tracing::warn!("settings.json not found, will be created by SillyTavern on first run");
+        }
+    }
 
     let mut std_cmd = std::process::Command::new(&node_path);
 

@@ -54,7 +54,7 @@ fn main() {
         }
     }
 
-    sillytavern_launcher_lib::run()
+    tavern_deepseek_launcher_lib::run()
 }
 
 #[cfg(target_os = "windows")]

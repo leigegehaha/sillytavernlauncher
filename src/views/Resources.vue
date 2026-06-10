@@ -19,8 +19,14 @@ import {
   ChevronDown,
   ChevronUp,
   MessageCircle,
+  FileCode,
+  Zap,
+  Package,
+  Settings,
 } from 'lucide-vue-next'
 import { useI18n } from 'vue-i18n'
+import { toast } from 'vue-sonner'
+import { open } from '@tauri-apps/plugin-dialog'
 import { openCharacterCardDialog } from '../lib/useCharacterCardDialog'
 import { openUploadCharacterCardDialog } from '../lib/useUploadCharacterCard'
 import { openWorldInfoDialog } from '../lib/useWorldInfoDialog'
@@ -28,10 +34,13 @@ import { openUploadWorldInfoDialog } from '../lib/useUploadWorldInfo'
 import { openChatDialog } from '../lib/useChatDialog'
 import { Dialog } from '../lib/useDialog'
 import ResourceMigrateDialog from '../components/ResourceMigrateDialog.vue'
+import BundledCards from '../components/BundledCards.vue'
+import BundledPresets from '../components/BundledPresets.vue'
 import AppTooltip from '../components/AppTooltip.vue'
 
 const { t } = useI18n()
-const activeTab = ref<'characters' | 'worlds' | 'chats'>('characters')
+const isTauri = !!(window as any).__TAURI_INTERNALS__
+const activeTab = ref<'characters' | 'worlds' | 'chats' | 'presets' | 'regex' | 'bundled' | 'bundledPresets'>('characters')
 
 const showMigrateDialog = ref(false)
 
@@ -46,6 +55,19 @@ interface WorldInfoFile {
   fileName: string
   size: number
   modifiedMs: number | null
+}
+
+interface PresetFile {
+  file_name: string
+  category: string
+  size: number
+  modified_ms: number | null
+}
+
+interface RegexFile {
+  file_name: string
+  size: number
+  modified_ms: number | null
 }
 
 // ── 对话历史接口 ─────────────────────────────────────
@@ -68,6 +90,8 @@ const errorMsg = ref('')
 const characterCards = ref<CharacterCardFile[]>([])
 const worldInfos = ref<WorldInfoFile[]>([])
 const chatGroups = ref<ChatGroup[]>([])
+const presets = ref<PresetFile[]>([])
+const regexScripts = ref<RegexFile[]>([])
 const thumbUrlByFileName = ref<Record<string, string>>({})
 const thumbLoadingByFileName = ref<Record<string, boolean>>({})
 
@@ -467,6 +491,8 @@ const toggleFolder = (charFolder: string) => {
 const refreshCurrent = () => {
   if (activeTab.value === 'characters') loadCharacterCards()
   else if (activeTab.value === 'worlds') loadWorldInfos()
+  else if (activeTab.value === 'presets') loadPresets()
+  else if (activeTab.value === 'regex') loadRegexScripts()
   else loadChats()
 }
 
@@ -480,10 +506,125 @@ function parseChatDate(fileName: string): string {
   return ''
 }
 
+// ── 预设管理 ─────────────────────────────────────────────
+const loadPresets = async () => {
+  loading.value = true
+  errorMsg.value = ''
+  try {
+    const list = await invoke<PresetFile[]>('list_presets')
+    presets.value = list
+  } catch (e: any) {
+    errorMsg.value = e?.message ? String(e.message) : String(e)
+    presets.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+const importPreset = async () => {
+  if (!isTauri) return
+  try {
+    const selected = await open({
+      multiple: true,
+      filters: [{ name: '预设文件', extensions: ['json'] }],
+    })
+    if (!selected) return
+    const paths = Array.isArray(selected) ? selected : [selected]
+    const category = 'context' // default to context, user can change later
+    for (const path of paths) {
+      try {
+        await invoke('import_preset_file', { sourcePath: path, category, fileName: null })
+        toast.success(t('resources.presets.importSuccessMsg', { name: path.split('/').pop() || path }))
+      } catch (e: any) {
+        toast.error(e?.message || String(e))
+      }
+    }
+    await loadPresets()
+  } catch (e: any) {
+    if (e !== 'cancelled') toast.error(String(e))
+  }
+}
+
+const deleteSinglePreset = async (preset: PresetFile, event: Event) => {
+  event.stopPropagation()
+  Dialog.warning({
+    title: t('resources.confirmDelete'),
+    msg: t('resources.presets.confirmDelete', { name: preset.file_name }),
+    confirmText: t('common.delete'),
+    cancelText: t('common.cancel'),
+    onConfirm: async () => {
+      try {
+        await invoke('delete_presets', { items: [preset] })
+        await loadPresets()
+      } catch (e: any) {
+        toast.error(e?.message || String(e))
+      }
+    },
+  })
+}
+
+// ── 正则管理 ─────────────────────────────────────────────
+const loadRegexScripts = async () => {
+  loading.value = true
+  errorMsg.value = ''
+  try {
+    const list = await invoke<RegexFile[]>('list_regex_scripts')
+    regexScripts.value = list
+  } catch (e: any) {
+    errorMsg.value = e?.message ? String(e.message) : String(e)
+    regexScripts.value = []
+  } finally {
+    loading.value = false
+  }
+}
+
+const importRegex = async () => {
+  if (!isTauri) return
+  try {
+    const selected = await open({
+      multiple: true,
+      filters: [{ name: '正则脚本', extensions: ['json', 'js'] }],
+    })
+    if (!selected) return
+    const paths = Array.isArray(selected) ? selected : [selected]
+    for (const path of paths) {
+      try {
+        await invoke('import_regex_script', { sourcePath: path, fileName: null })
+        toast.success(t('resources.regex.importSuccessMsg', { name: path.split('/').pop() || path }))
+      } catch (e: any) {
+        toast.error(e?.message || String(e))
+      }
+    }
+    await loadRegexScripts()
+  } catch (e: any) {
+    if (e !== 'cancelled') toast.error(String(e))
+  }
+}
+
+const deleteSingleRegex = async (fileName: string, event: Event) => {
+  event.stopPropagation()
+  Dialog.warning({
+    title: t('resources.confirmDelete'),
+    msg: t('resources.confirmDeleteSingle', { type: t('resources.regex.title'), name: fileName }),
+    confirmText: t('common.delete'),
+    cancelText: t('common.cancel'),
+    onConfirm: async () => {
+      try {
+        await invoke('delete_regex_scripts', { fileNames: [fileName] })
+        await loadRegexScripts()
+      } catch (e: any) {
+        toast.error(e?.message || String(e))
+      }
+    },
+  })
+}
+
 onMounted(async () => {
   await loadCharacterCards()
   await loadWorldInfos()
   await loadChats()
+  await loadPresets()
+  await loadRegexScripts()
 })
 
 onUnmounted(() => {
@@ -518,6 +659,28 @@ onUnmounted(() => {
             {{ t('resources.addWorldInfo') }}
           </button>
         </AppTooltip>
+        <AppTooltip :text="t('resources.presets.addPreset')">
+          <button
+            v-if="activeTab === 'presets'"
+            class="px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-2 border border-blue-200/50 dark:border-blue-800/50"
+            type="button"
+            @click="importPreset()"
+          >
+            <PhPlus :size="16" weight="bold" />
+            {{ t('resources.presets.addPreset') }}
+          </button>
+        </AppTooltip>
+        <AppTooltip :text="t('resources.regex.addRegex')">
+          <button
+            v-if="activeTab === 'regex'"
+            class="px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 hover:text-blue-700 dark:hover:text-blue-300 flex items-center gap-2 border border-blue-200/50 dark:border-blue-800/50"
+            type="button"
+            @click="importRegex()"
+          >
+            <PhPlus :size="16" weight="bold" />
+            {{ t('resources.regex.addRegex') }}
+          </button>
+        </AppTooltip>
         <AppTooltip :text="t('common.refresh')">
           <button
             class="px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-2"
@@ -547,9 +710,10 @@ onUnmounted(() => {
         :class="[
           'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2',
           activeTab === 'characters'
-            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm'
+            ? 'text-[#e6b422] shadow-sm'
             : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50',
         ]"
+        :style="activeTab === 'characters' ? { background: '#3a2a1a', border: '1px solid rgba(230, 180, 34, 0.3)' } : {}"
         type="button"
         @click="activeTab = 'characters'"
       >
@@ -560,9 +724,10 @@ onUnmounted(() => {
         :class="[
           'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2',
           activeTab === 'worlds'
-            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm'
+            ? 'text-[#e6b422] shadow-sm'
             : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50',
         ]"
+        :style="activeTab === 'worlds' ? { background: '#3a2a1a', border: '1px solid rgba(230, 180, 34, 0.3)' } : {}"
         type="button"
         @click="activeTab = 'worlds'"
       >
@@ -573,14 +738,71 @@ onUnmounted(() => {
         :class="[
           'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2',
           activeTab === 'chats'
-            ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 shadow-sm'
+            ? 'text-[#e6b422] shadow-sm'
             : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50',
         ]"
+        :style="activeTab === 'chats' ? { background: '#3a2a1a', border: '1px solid rgba(230, 180, 34, 0.3)' } : {}"
         type="button"
         @click="activeTab = 'chats'"
       >
         <PhChatCircleText :size="16" weight="duotone" />
         {{ t('resources.chat.title') }}
+      </button>
+      <button
+        :class="[
+          'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2',
+          activeTab === 'presets'
+            ? 'text-[#e6b422] shadow-sm'
+            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50',
+        ]"
+        :style="activeTab === 'presets' ? { background: '#3a2a1a', border: '1px solid rgba(230, 180, 34, 0.3)' } : {}"
+        type="button"
+        @click="activeTab = 'presets'"
+      >
+        <FileCode :size="16" />
+        {{ t('resources.presets.title') }}
+      </button>
+      <button
+        :class="[
+          'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2',
+          activeTab === 'regex'
+            ? 'text-[#e6b422] shadow-sm'
+            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50',
+        ]"
+        :style="activeTab === 'regex' ? { background: '#3a2a1a', border: '1px solid rgba(230, 180, 34, 0.3)' } : {}"
+        type="button"
+        @click="activeTab = 'regex'"
+      >
+        <Zap :size="16" />
+        {{ t('resources.regex.title') }}
+      </button>
+      <button
+        :class="[
+          'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2',
+          activeTab === 'bundled'
+            ? 'text-[#e6b422] shadow-sm'
+            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50',
+        ]"
+        :style="activeTab === 'bundled' ? { background: '#3a2a1a', border: '1px solid rgba(230, 180, 34, 0.3)' } : {}"
+        type="button"
+        @click="activeTab = 'bundled'"
+      >
+        <Package :size="16" />
+        {{ '内置角色卡' }}
+      </button>
+      <button
+        :class="[
+          'px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2',
+          activeTab === 'bundledPresets'
+            ? 'text-[#e6b422] shadow-sm'
+            : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-slate-700/50',
+        ]"
+        :style="activeTab === 'bundledPresets' ? { background: '#3a2a1a', border: '1px solid rgba(230, 180, 34, 0.3)' } : {}"
+        type="button"
+        @click="activeTab = 'bundledPresets'"
+      >
+        <Settings :size="16" />
+        {{ '内置预设' }}
       </button>
     </div>
 
@@ -1036,6 +1258,67 @@ onUnmounted(() => {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- ─── 预设 ─── -->
+      <div v-else-if="activeTab === 'presets'" class="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div v-if="loading" class="text-center py-8 text-sm text-slate-400">{{ t('resources.loading') }}</div>
+        <div v-else-if="presets.length === 0" class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm text-center">
+          <div class="text-sm font-medium text-slate-500 dark:text-slate-400">{{ t('resources.presets.noPresets') }}</div>
+          <div class="text-xs text-slate-400 mt-1">{{ t('resources.presets.noPresetsHint') }}</div>
+        </div>
+        <div v-else class="space-y-2">
+          <div class="text-xs text-slate-500 dark:text-slate-400 px-1">{{ t('resources.presets.totalPresets', { count: presets.length }) }}</div>
+          <div v-for="preset in presets" :key="preset.category + '/' + preset.file_name" class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 flex items-center gap-4 group">
+            <div class="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center shrink-0">
+              <FileCode class="w-5 h-5 text-blue-500 dark:text-blue-400" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{{ preset.file_name }}</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-xs">{{ preset.category }}</span>
+                <span class="ml-2">{{ formatSize(preset.size) }}</span>
+              </div>
+            </div>
+            <button class="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" @click="deleteSinglePreset(preset, $event)">
+              <PhTrash :size="16" weight="bold" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 正则 ─── -->
+      <div v-else-if="activeTab === 'regex'" class="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div v-if="loading" class="text-center py-8 text-sm text-slate-400">{{ t('resources.loading') }}</div>
+        <div v-else-if="regexScripts.length === 0" class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm text-center">
+          <div class="text-sm font-medium text-slate-500 dark:text-slate-400">{{ t('resources.regex.noScripts') }}</div>
+          <div class="text-xs text-slate-400 mt-1">{{ t('resources.regex.noScriptsHint') }}</div>
+        </div>
+        <div v-else class="space-y-2">
+          <div class="text-xs text-slate-500 dark:text-slate-400 px-1">{{ t('resources.regex.totalScripts', { count: regexScripts.length }) }}</div>
+          <div v-for="script in regexScripts" :key="script.file_name" class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 flex items-center gap-4 group">
+            <div class="w-10 h-10 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center shrink-0">
+              <Zap class="w-5 h-5 text-purple-500 dark:text-purple-400" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{{ script.file_name }}</div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">{{ formatSize(script.size) }}</div>
+            </div>
+            <button class="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" @click="deleteSingleRegex(script.file_name, $event)">
+              <PhTrash :size="16" weight="bold" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── 内置角色卡 ─── -->
+      <div v-else-if="activeTab === 'bundled'" class="animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <BundledCards @card-imported="loadCharacterCards()" />
+      </div>
+
+      <!-- ─── 内置预设 ─── -->
+      <div v-else-if="activeTab === 'bundledPresets'" class="animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <BundledPresets @preset-imported="loadPresets()" />
       </div>
     </div>
   </div>
