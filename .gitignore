@@ -80,3 +80,16 @@ data/**
 /data/
 /data/**
 /data/config.json
+
+# =========================
+# Dev & WIP (不提交)
+# =========================
+.github/
+backups/
+docs/
+node/
+assets/cards/
+src-tauri/resources/
+src-tauri/src/deep_tavern/
+src/deep-tavern/
+public/videos/
