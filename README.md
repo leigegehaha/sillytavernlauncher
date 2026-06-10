@@ -1,203 +1,283 @@
+<div align="center">
+
+<img src="assets/logo.png" alt="Tavern Deepseek" width="180" />
+
 # 🍺 Tavern Deepseek Launcher
 
-> SillyTavern 酒馆桌面启动器 — 零配置、一键启动、中世纪暗黑奇幻风  
-> Tauri v2 + Vue 3 · 跨平台 · 内置酒馆 & Node.js
+**SillyTavern 酒馆桌面启动器 — 零配置、一键启动**
 
-<p align="center">
-  <img src="assets/logo.png" alt="Tavern Deepseek" width="220" />
+[![Release](https://img.shields.io/github/v/release/leigegehaha/sillytavernlauncher?color=%23e6b422&style=for-the-badge)](https://github.com/leigegehaha/sillytavernlauncher/releases)
+[![Platform](https://img.shields.io/badge/macOS-Windows-lightgrey?style=for-the-badge&logo=apple)](https://github.com/leigegehaha/sillytavernlauncher/releases)
+[![Tauri](https://img.shields.io/badge/Tauri-v2-FFC131?style=for-the-badge&logo=tauri)](https://v2.tauri.app/)
+[![Vue](https://img.shields.io/badge/Vue-3-4FC08D?style=for-the-badge&logo=vuedotjs)](https://vuejs.org/)
+[![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
+
+<p>
+  <sub>中世纪酒馆暗黑奇幻风 · 内置 DeepSeek Tavern 大模型 · 3000+ 角色卡即插即用</sub>
 </p>
 
-<p align="center">
-  <a href="https://github.com/leigegehaha/sillytavernlauncher/releases"><img src="https://img.shields.io/badge/下载-v2.0.0-blue?style=flat-square" alt="Release"></a>
-  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows-lightgrey?style=flat-square" alt="Platform">
-  <img src="https://img.shields.io/badge/framework-Tauri%20v2%20%2B%20Vue%203-brightgreen?style=flat-square" alt="Framework">
-  <img src="https://img.shields.io/badge/status-active-success?style=flat-square" alt="Status">
-</p>
+</div>
 
 ---
 
+<div align="center">
+
 ## 📸 界面预览
 
-<p align="center">
-  <img src="assets/media/启动页.png" alt="启动页" width="80%" />
-</p>
+<img src="assets/media/启动页.png" alt="启动页" width="85%" />
 
 <details>
-<summary>更多截图 👈 点击展开</summary>
-
-### 角色卡管理
-<img src="assets/media/角色卡资源.png" alt="角色卡管理" width="80%" />
-
-### 配置教程
-<img src="assets/media/教程.png" alt="教程页面" width="80%" />
-
+<summary><b>📷 更多截图 — 点击展开</b></summary>
+<br>
+<p><b>🃏 角色卡管理</b></p>
+<img src="assets/media/角色卡资源.png" alt="角色卡管理" width="85%" />
+<br><br>
+<p><b>📖 配置教程</b></p>
+<img src="assets/media/教程.png" alt="教程页面" width="85%" />
 </details>
 
 ---
 
-## 🎬 快速演示
+## 🎬 演示视频
 
-<video src="assets/media/demo视频.mp4" controls width="100%"></video>
+<video src="assets/media/demo视频.mp4" controls width="85%"></video>
+
+</div>
 
 ---
 
 ## 🍺 酒馆大模型 — DeepSeek Tavern
 
-Tavern Deepseek Launcher 内置了**酒馆专属大模型服务**，为 SillyTavern 角色扮演场景深度定制：
+> 启动器内置**酒馆专属大模型服务**，为 SillyTavern 角色扮演深度定制
 
-| 特性 | 说明 |
-|------|------|
-| 🧠 **v2-pro** | 旗舰模型，极致角色扮演 + 复杂剧情推理 |
-| ⚡ **v2-turbo** | 快速响应，适合日常对话 |
-| 🎭 **角色扮演优化** | 专为 SillyTavern 调优的 prompt 和输出风格 |
-| 🔑 **一键集成** | 在酒馆大模型页面获取 API Key，自动配置到 API 连接 |
-| 💰 **按量计费** | 按 token 计费，低门槛使用 |
+<table>
+<tr>
+  <td width="50%">
+    <h3>🧠 v2-pro</h3>
+    旗舰模型，极致角色扮演体验<br>
+    擅长复杂剧情推理与长对话
+  </td>
+  <td width="50%">
+    <h3>⚡ v2-turbo</h3>
+    快速响应，适合日常对话<br>
+    低延迟，高性价比
+  </td>
+</tr>
+<tr>
+  <td>
+    <h3>🎭 角色扮演优化</h3>
+    专为 SillyTavern 调优<br>
+    中文角色扮演自然流畅
+  </td>
+  <td>
+    <h3>💰 按量计费</h3>
+    按 token 计费，低门槛<br>
+    用多少付多少
+  </td>
+</tr>
+</table>
 
-### 获取 Key
+### 🔑 三步开始
 
-1. 点击启动器左侧 **🍺 酒馆大模型**
-2. 点击 **"酒馆专属大模型网站"** 跳转到 [deepseektavern.com](https://deepseektavern.com)
-3. 注册/登录 → 创建 API Key
-4. 复制 Key 粘贴到启动器的 **API 连接** 页面
-5. 🍺 大功告成！
+| 步骤 | 操作 |
+|:---:|---|
+| **①** | 点击启动器左侧 **🍺 酒馆大模型** |
+| **②** | 点击 **"酒馆专属大模型网站"** → [deepseektavern.com](https://deepseektavern.com) 注册获取 Key |
+| **③** | 粘贴 Key 到 **API 连接** 页面 → 🍺 完成！ |
 
 ---
 
 ## ✨ 功能一览
 
-| 模块 | 功能 |
-|------|------|
-| 🍺 **酒馆大模型** | DeepSeek Tavern 模型服务，API Key 管理 |
-| 🔑 **API 连接** | 多 Provider 密钥管理，OpenAI 兼容端点，连接测试 |
-| ▶️ **一键启动** | SillyTavern 零配置安装和启动 |
-| 🃏 **角色卡管理** | PNG 角色卡读取/导入/删除，3000+ 预设角色库 |
-| 🔌 **拓展管理** | 拓展安装、Git 更新、启停控制 |
-| ⚙️ **酒馆选项** | config.yaml 可视化编辑，配置迁移 |
-| 📦 **版本管理** | SillyTavern 多版本安装/切换 |
-| 🖥️ **控制台** | 内置酒馆桌面窗口模式 |
-| 🛠️ **教程** | 配置修复、依赖检测、网络诊断 |
+<table>
+<tr>
+  <td align="center" width="33%">
+    <h3>🍺<br>酒馆大模型</h3>
+    DeepSeek Tavern 模型服务<br>API Key 一键管理
+  </td>
+  <td align="center" width="33%">
+    <h3>🔑<br>API 连接</h3>
+    多 Provider 密钥管理<br>OpenAI 兼容端点
+  </td>
+  <td align="center" width="33%">
+    <h3>▶️<br>一键启动</h3>
+    SillyTavern 零配置<br>内置 Node.js 自动部署
+  </td>
+</tr>
+<tr>
+  <td align="center">
+    <h3>🃏<br>角色卡管理</h3>
+    PNG 解析/导入/删除<br>3000+ 预设角色库
+  </td>
+  <td align="center">
+    <h3>🔌<br>拓展管理</h3>
+    Git 安装/更新/启停<br>插件生态一键管理
+  </td>
+  <td align="center">
+    <h3>⚙️<br>酒馆选项</h3>
+    config.yaml 可视化编辑<br>配置迁移一键完成
+  </td>
+</tr>
+<tr>
+  <td align="center">
+    <h3>📦<br>版本管理</h3>
+    SillyTavern 多版本<br>安装/切换/卸载
+  </td>
+  <td align="center">
+    <h3>🖥️<br>控制台</h3>
+    内置桌面窗口模式<br>沉浸式角色扮演体验
+  </td>
+  <td align="center">
+    <h3>🛠️<br>教程</h3>
+    配置修复/依赖检测<br>网络诊断一站搞定
+  </td>
+</tr>
+</table>
 
 ---
 
 ## 🏗️ 技术栈
 
-- **桌面框架**: [Tauri v2](https://v2.tauri.app/) — Rust 驱动，原生性能，小巧体积
-- **前端**: Vue 3 + TypeScript + Vite
-- **样式**: Tailwind CSS + 中世纪酒馆手工暗黑主题
-- **图标**: Phosphor Icons
-- **Rust 后端**: tokio, reqwest, serde, tracing
+<div align="center">
+
+| 层 | 技术 | 说明 |
+|:---:|------|------|
+| 🖥️ **桌面** | [Tauri v2](https://v2.tauri.app/) | Rust 驱动，原生性能，体积 < 5MB |
+| 🎨 **前端** | Vue 3 + Vite + Tailwind CSS | 响应式 + 中世纪酒馆手工暗黑主题 |
+| ⚙️ **后端** | Rust · tokio · reqwest · serde | 异步 I/O，类型安全 |
+| 📦 **打包** | Tauri Bundler + GitHub Actions | macOS DMG · Windows MSI · Linux AppImage |
+
+</div>
 
 ---
 
 ## 📦 下载安装
 
-### macOS (Apple Silicon)
+<div align="center">
 
-[![Download macOS](https://img.shields.io/badge/macOS-DMG-333?style=for-the-badge&logo=apple)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
+### 🍎 macOS
 
-下载 `.dmg` 文件，双击挂载，拖入 `Applications` 即可。
+[![Download macOS](https://img.shields.io/badge/下载_macOS_DMG-333333?style=for-the-badge&logo=apple)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
 
-### Windows
+下载 `.dmg` → 双击挂载 → 拖入 `Applications`
 
-[![Download Windows](https://img.shields.io/badge/Windows-EXE-0078D6?style=for-the-badge&logo=windows)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
+### 🪟 Windows
 
-下载 `.msi` 安装包，双击安装。
+[![Download Windows](https://img.shields.io/badge/下载_Windows_MSI-0078D6?style=for-the-badge&logo=windows)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
+
+下载 `.msi` → 双击安装 → 开始使用
+
+</div>
 
 ---
 
 ## 🛠️ 从源码构建
 
-### 前置要求
-
-- [Rust](https://www.rust-lang.org/) (最新 stable)
-- [Node.js](https://nodejs.org/) 18+
-
-### 开发模式
-
 ```bash
+# 克隆仓库
 git clone https://github.com/leigegehaha/sillytavernlauncher.git
 cd sillytavernlauncher
+
+# 安装依赖
 npm install
+
+# 开发模式
 npm run tauri dev
-```
 
-### 生产构建
-
-```bash
-npm install
+# 生产构建
 npm run tauri build
 ```
 
-构建产物在 `src-tauri/target/release/bundle/`。
+> 需要 [Rust](https://rustup.rs/) (latest stable) + [Node.js](https://nodejs.org/) 18+
 
 ---
 
 ## 📂 项目结构
 
+<details>
+<summary><b>点击展开目录树 📁</b></summary>
+
 ```
 sillytavern-launcher/
 ├── src/                        # Vue 3 前端
-│   ├── views/                  # 页面组件
-│   │   ├── DeepSeek.vue        # 酒馆大模型
-│   │   ├── ApiConfig.vue       # API 连接
-│   │   ├── Home.vue            # 一键启动
-│   │   ├── Resources.vue       # 角色卡管理
-│   │   ├── Extensions.vue      # 拓展管理
-│   │   ├── Tavern.vue          # 酒馆选项
-│   │   ├── Versions.vue        # 版本管理
-│   │   ├── Tools.vue           # 教程
-│   │   ├── Console.vue         # 控制台
+│   ├── views/
+│   │   ├── DeepSeek.vue        # 🍺 酒馆大模型
+│   │   ├── ApiConfig.vue       # 🔑 API 连接
+│   │   ├── Home.vue            # ▶️ 一键启动
+│   │   ├── Resources.vue       # 🃏 角色卡管理
+│   │   ├── Extensions.vue      # 🔌 拓展管理
+│   │   ├── Tavern.vue          # ⚙️ 酒馆选项
+│   │   ├── Versions.vue        # 📦 版本管理
+│   │   ├── Console.vue         # 🖥️ 控制台
+│   │   ├── Tools.vue           # 🛠️ 教程
 │   │   └── Settings.vue        # 设置
-│   ├── components/             # 通用组件
+│   ├── components/
 │   │   ├── TavernAccount.vue   # 酒馆大模型账户
-│   │   ├── BackgroundVideo.vue # 动态背景
-│   │   └── ...
-│   ├── layouts/Oheader.vue     # 中世纪酒馆侧边栏
-│   └── router/
+│   │   └── BackgroundVideo.vue # 动态背景
+│   └── layouts/Oheader.vue     # 中世纪酒馆侧边栏
 ├── src-tauri/                  # Rust 后端
 │   ├── src/
-│   │   ├── lib.rs              # 应用入口 & 命令注册
+│   │   ├── lib.rs              # 应用入口
 │   │   ├── sillytavern.rs      # SillyTavern 管理
 │   │   ├── secrets.rs          # API 密钥管理
 │   │   ├── tavern_api.rs       # 酒馆 API 客户端
 │   │   ├── config.rs           # 配置管理
-│   │   ├── character.rs        # 角色卡处理
-│   │   └── ...
+│   │   └── character.rs        # 角色卡处理
 │   └── tauri.conf.json
 ├── assets/
 │   ├── logo.png
-│   └── media/                  # 截图和演示视频
-└── README.md
+│   └── media/                  # 截图 & 演示视频
+└── .github/workflows/          # CI/CD 自动构建
 ```
+
+</details>
 
 ---
 
 ## 🎨 设计风格
 
-中世纪酒馆羊皮卷轴暗黑奇幻风：
+<div align="center">
 
 ```
-背景 #120c08    金辉高亮 #e6b422
-边框 #b48c64    文字 #d4a574
-玻璃拟态侧边栏   动态火焰背景
+╔══════════════════════════════════════╗
+║   中世纪酒馆 · 羊皮卷轴 · 暗黑奇幻  ║
+╠══════════════════════════════════════╣
+║  底色  #120c08    金辉  #e6b422     ║
+║  边框  #b48c64    文字  #d4a574     ║
+║  玻璃拟态侧边栏   动态火焰背景      ║
+╚══════════════════════════════════════╝
 ```
+
+</div>
 
 ---
 
-## 🧪 开发中功能
+## 🧪 路线图
 
-- [ ] **DeepTavern** 内置聊天客户端（独立窗口，直接与角色卡对话）
+- [x] macOS 原生支持
+- [x] DeepSeek Tavern 酒馆大模型集成
+- [x] 角色卡管理 + 3000+ 预设
+- [x] GitHub Actions 跨平台自动构建
+- [ ] **DeepTavern** — 内置聊天客户端
 - [ ] TTS 语音合成集成
 - [ ] 更多模型 Provider 支持
 
 ---
 
+<div align="center">
+
 ## 📄 致谢 & 许可
 
-本项目基于 [al01cn/sillyTavern-launcher](https://github.com/al01cn/sillyTavern-launcher) 开发。
+基于 [al01cn/sillyTavern-launcher](https://github.com/al01cn/sillyTavern-launcher) 开发
 
-由 **磊哥哥** 维护 · [「磊哥哥科技拆解室」](https://space.bilibili.com/) · MIT License
+由 **磊哥哥** ❤️ 维护 · 「磊哥哥科技拆解室」 · MIT License
 
----
+<br>
 
-*"来酒馆坐坐，喝一杯，聊聊天。" 🍻*
+*"来酒馆坐坐，喝一杯，聊聊天。"* 🍻
+
+<br>
+
+<img src="assets/logo.png" alt="Bottom" width="64" />
+
+</div>
