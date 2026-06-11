@@ -43,8 +43,6 @@
   },
   "bundle": {
     "resources": {
-      "resources/sillytavern-1.18.0": "sillytavern",
-      "resources/node-v22.12.0-darwin-arm64": "node-v22.12.0-darwin-arm64",
       "resources/character-cards": "character-cards",
       "resources/presets": "presets"
     },
