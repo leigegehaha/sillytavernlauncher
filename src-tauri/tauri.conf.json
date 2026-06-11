@@ -50,7 +50,7 @@
     "publisher": "磊哥哥",
     "license": "MIT",
     "active": true,
-    "createUpdaterArtifacts": true,
+    "createUpdaterArtifacts": false,
     "targets": "all",
     "icon": [
       "icons/32x32.png",
@@ -79,12 +79,7 @@
           "English": "nsis/languages/English.nsh"
         }
       },
-      "wix": {
-        "language": [
-          "zh-CN",
-          "en-US"
-        ]
-      }
+      "wix": null
     }
   }
 }
