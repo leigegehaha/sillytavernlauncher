@@ -89,6 +89,10 @@ docs/
 node/
 assets/cards/
 src-tauri/resources/
+!src-tauri/resources/character-cards/
+!src-tauri/resources/character-cards/.gitkeep
+!src-tauri/resources/presets/
+!src-tauri/resources/presets/.gitkeep
 src-tauri/src/deep_tavern/
 src/deep-tavern/
 public/videos/
