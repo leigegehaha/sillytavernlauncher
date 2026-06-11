@@ -108,14 +108,10 @@ jobs:
           # Extract: the zip contains SillyTavern-1.18.0/ top-level dir (capital S, T)
           echo "📦 Extracting SillyTavern..."
           ST_RESOURCE="src-tauri/resources/sillytavern-${ST_VER}"
+          mkdir -p src-tauri/resources/tmp-st
           
-          if [[ "$RUNNER_OS" == "Windows" ]]; then
-            mkdir -p src-tauri/resources/tmp-st
-            powershell -Command "Expand-Archive -Path '${ST_ZIP}' -DestinationPath 'src-tauri/resources/tmp-st' -Force"
-          else
-            mkdir -p src-tauri/resources/tmp-st
-            unzip -qo "${ST_ZIP}" -d src-tauri/resources/tmp-st/
-          fi
+          # Use unzip for all platforms (available in Git Bash on Windows)
+          unzip -qo "${ST_ZIP}" -d src-tauri/resources/tmp-st/
 
           # Rename SillyTavern-1.18.0 → sillytavern-1.18.0
           if [ -d "src-tauri/resources/tmp-st/SillyTavern-${ST_VER}" ]; then
@@ -188,11 +184,8 @@ jobs:
           mkdir -p src-tauri/resources/tmp-node
 
           if [[ "${NODE_OS}" == "win" ]]; then
-            if [[ "$RUNNER_OS" == "Windows" ]]; then
-              powershell -Command "Expand-Archive -Path '${NODE_ZIP}' -DestinationPath 'src-tauri/resources/tmp-node' -Force"
-            else
-              unzip -qo "${NODE_ZIP}" -d src-tauri/resources/tmp-node/
-            fi
+            # Use unzip for Windows zip (available in Git Bash)
+            unzip -qo "${NODE_ZIP}" -d src-tauri/resources/tmp-node/
           else
             tar xzf "${NODE_ZIP}" -C src-tauri/resources/tmp-node/
           fi
