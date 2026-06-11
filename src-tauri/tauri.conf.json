@@ -43,6 +43,8 @@
   },
   "bundle": {
     "resources": {
+      "resources/sillytavern-1.18.0": "sillytavern-1.18.0",
+      "resources/node": "node",
       "resources/character-cards": "character-cards",
       "resources/presets": "presets"
     },

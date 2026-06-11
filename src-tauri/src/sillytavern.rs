@@ -58,6 +58,19 @@ pub fn get_bundled_tavern_path(app: AppHandle) -> Result<String, String> {
         .path()
         .resource_dir()
         .map_err(|e| format!("无法获取资源目录: {}", e))?;
+    
+    // 优先查找 sillytavern-<version> 目录（如 sillytavern-1.18.0）
+    if let Ok(entries) = std::fs::read_dir(&resource_dir) {
+        for entry in entries.flatten() {
+            let name = entry.file_name();
+            let name_str = name.to_string_lossy();
+            if name_str.starts_with("sillytavern-") {
+                return Ok(entry.path().to_string_lossy().to_string());
+            }
+        }
+    }
+    
+    // 回退：查找 sillytavern 目录
     let bundled = resource_dir.join("sillytavern");
     if bundled.exists() {
         return Ok(bundled.to_string_lossy().to_string());

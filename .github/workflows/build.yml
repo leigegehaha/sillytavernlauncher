@@ -8,6 +8,8 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  SILLYTAVERN_VERSION: "1.18.0"
+  NODE_VERSION: "22.12.0"
 
 jobs:
   build:
@@ -18,13 +20,21 @@ jobs:
           - platform: macos-latest
             args: --target aarch64-apple-darwin
             rust_target: aarch64-apple-darwin
+            node_os: darwin
+            node_arch: arm64
           - platform: macos-latest
             args: --target x86_64-apple-darwin
             rust_target: x86_64-apple-darwin
+            node_os: darwin
+            node_arch: x64
           - platform: windows-latest
             args: ''
+            node_os: win
+            node_arch: x64
           - platform: ubuntu-22.04
             args: ''
+            node_os: linux
+            node_arch: x64
             deps: libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
     runs-on: ${{ matrix.platform }}
@@ -69,11 +79,164 @@ jobs:
       - name: Sync version
         run: bun run sync-version
 
-      - name: Ensure resource directories exist
+      - name: Download SillyTavern source
+        shell: bash
+        env:
+          ST_VER: ${{ env.SILLYTAVERN_VERSION }}
+        run: |
+          echo "📥 Downloading SillyTavern ${ST_VER}..."
+          ST_URL="https://github.com/SillyTavern/SillyTavern/archive/refs/tags/${ST_VER}.zip"
+          ST_ZIP="/tmp/sillytavern-${ST_VER}.zip"
+
+          # Try multiple mirrors
+          for mirror in "" "https://ghfast.top/" "https://gh.llkk.cc/"; do
+            URL="${mirror}${ST_URL}"
+            echo "  Trying: ${URL}"
+            if curl -fsSL -o "${ST_ZIP}" "${URL}" --connect-timeout 30 --max-time 600; then
+              echo "  ✅ Downloaded successfully"
+              break
+            fi
+            echo "  ❌ Failed, trying next mirror..."
+          done
+
+          if [ ! -f "${ST_ZIP}" ] || [ ! -s "${ST_ZIP}" ]; then
+            echo "⚠️ SillyTavern download failed, creating placeholder"
+            mkdir -p src-tauri/resources/sillytavern-${ST_VER}
+            exit 0
+          fi
+
+          # Extract: the zip contains SillyTavern-1.18.0/ top-level dir (capital S, T)
+          echo "📦 Extracting SillyTavern..."
+          ST_RESOURCE="src-tauri/resources/sillytavern-${ST_VER}"
+          
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            mkdir -p src-tauri/resources/tmp-st
+            powershell -Command "Expand-Archive -Path '${ST_ZIP}' -DestinationPath 'src-tauri/resources/tmp-st' -Force"
+          else
+            mkdir -p src-tauri/resources/tmp-st
+            unzip -qo "${ST_ZIP}" -d src-tauri/resources/tmp-st/
+          fi
+
+          # Rename SillyTavern-1.18.0 → sillytavern-1.18.0
+          if [ -d "src-tauri/resources/tmp-st/SillyTavern-${ST_VER}" ]; then
+            mv "src-tauri/resources/tmp-st/SillyTavern-${ST_VER}" "${ST_RESOURCE}"
+            rmdir src-tauri/resources/tmp-st
+          else
+            echo "⚠️ Expected SillyTavern-${ST_VER} not found, checking..."
+            ls src-tauri/resources/tmp-st/
+            EXTRACTED=$(find src-tauri/resources/tmp-st -maxdepth 1 -type d | tail -1)
+            if [ -n "${EXTRACTED}" ]; then
+              mv "${EXTRACTED}" "${ST_RESOURCE}"
+              rmdir src-tauri/resources/tmp-st 2>/dev/null || true
+            fi
+          fi
+
+          # Remove node_modules if present (will be installed on first launch)
+          rm -rf "${ST_RESOURCE}/node_modules" 2>/dev/null || true
+
+          # Verify extraction
+          if [ -f "${ST_RESOURCE}/server.js" ]; then
+            echo "✅ SillyTavern extracted successfully (server.js found)"
+            echo "   Size: $(du -sh ${ST_RESOURCE} 2>/dev/null | cut -f1)"
+          else
+            echo "⚠️ Extraction may have failed (server.js not found), checking structure..."
+            ls -la "${ST_RESOURCE}/" 2>/dev/null || echo "   Directory not found!"
+          fi
+
+      - name: Download Node.js binary
+        shell: bash
+        env:
+          NODE_VER: ${{ env.NODE_VERSION }}
+          NODE_OS: ${{ matrix.node_os }}
+          NODE_ARCH: ${{ matrix.node_arch }}
+        run: |
+          echo "📥 Downloading Node.js v${NODE_VER} for ${NODE_OS}-${NODE_ARCH}..."
+
+          # Determine filename
+          if [[ "${NODE_OS}" == "win" ]]; then
+            NODE_FILENAME="node-v${NODE_VER}-${NODE_OS}-${NODE_ARCH}.zip"
+          else
+            NODE_FILENAME="node-v${NODE_VER}-${NODE_OS}-${NODE_ARCH}.tar.gz"
+          fi
+
+          NODE_EXTRACT_DIR="node-v${NODE_VER}-${NODE_OS}-${NODE_ARCH}"
+          NODE_RESOURCE="src-tauri/resources/node"
+          NODE_ZIP="/tmp/${NODE_FILENAME}"
+
+          # Try multiple mirrors
+          for mirror in \
+            "https://npmmirror.com/mirrors/node/v${NODE_VER}" \
+            "https://mirrors.aliyun.com/nodejs-release/v${NODE_VER}" \
+            "https://nodejs.org/dist/v${NODE_VER}"; do
+            URL="${mirror}/${NODE_FILENAME}"
+            echo "  Trying: ${URL}"
+            if curl -fsSL -o "${NODE_ZIP}" "${URL}" --connect-timeout 30 --max-time 600; then
+              echo "  ✅ Downloaded successfully ($(du -sh ${NODE_ZIP} | cut -f1))"
+              break
+            fi
+            echo "  ❌ Failed, trying next mirror..."
+          done
+
+          if [ ! -f "${NODE_ZIP}" ] || [ ! -s "${NODE_ZIP}" ]; then
+            echo "⚠️ Node.js download failed, app will prompt user to install on first launch"
+            mkdir -p "${NODE_RESOURCE}"
+            exit 0
+          fi
+
+          # Extract to a temp location first, then rename to unified "node"
+          echo "📦 Extracting Node.js..."
+          mkdir -p src-tauri/resources/tmp-node
+
+          if [[ "${NODE_OS}" == "win" ]]; then
+            if [[ "$RUNNER_OS" == "Windows" ]]; then
+              powershell -Command "Expand-Archive -Path '${NODE_ZIP}' -DestinationPath 'src-tauri/resources/tmp-node' -Force"
+            else
+              unzip -qo "${NODE_ZIP}" -d src-tauri/resources/tmp-node/
+            fi
+          else
+            tar xzf "${NODE_ZIP}" -C src-tauri/resources/tmp-node/
+          fi
+
+          # The archive extracts as node-v22.12.0-xxx/ top-level dir
+          # Rename it to just "node" for consistent resource mapping
+          if [ -d "src-tauri/resources/tmp-node/${NODE_EXTRACT_DIR}" ]; then
+            mv "src-tauri/resources/tmp-node/${NODE_EXTRACT_DIR}" "${NODE_RESOURCE}"
+            rmdir src-tauri/resources/tmp-node
+          else
+            echo "⚠️ Expected directory not found, listing contents..."
+            ls -la src-tauri/resources/tmp-node/
+            # Try to find the extracted directory
+            EXTRACTED=$(find src-tauri/resources/tmp-node -maxdepth 1 -type d | tail -1)
+            if [ -n "${EXTRACTED}" ] && [ -d "${EXTRACTED}" ]; then
+              mv "${EXTRACTED}" "${NODE_RESOURCE}"
+              rmdir src-tauri/resources/tmp-node 2>/dev/null || true
+            fi
+          fi
+
+          # Verify extraction
+          if [[ "${NODE_OS}" == "win" ]]; then
+            NODE_BIN="${NODE_RESOURCE}/node.exe"
+          else
+            NODE_BIN="${NODE_RESOURCE}/bin/node"
+          fi
+
+          if [ -f "${NODE_BIN}" ]; then
+            echo "✅ Node.js extracted successfully (node binary found)"
+            chmod +x "${NODE_BIN}" 2>/dev/null || true
+            echo "   Size: $(du -sh ${NODE_RESOURCE} 2>/dev/null | cut -f1)"
+          else
+            echo "⚠️ Extraction may have failed, checking structure..."
+            ls -la "${NODE_RESOURCE}/" 2>/dev/null || echo "   Directory not found!"
+            find src-tauri/resources/ -name "node" -o -name "node.exe" 2>/dev/null | head -5
+          fi
+
+      - name: Ensure other resource directories exist
         shell: bash
         run: |
           mkdir -p src-tauri/resources/character-cards
           mkdir -p src-tauri/resources/presets
+          echo "📋 Resource directory listing:"
+          du -sh src-tauri/resources/*/ 2>/dev/null || echo "   (empty)"
 
       - name: Build and Release
         uses: tauri-apps/tauri-action@v0

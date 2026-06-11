@@ -175,34 +175,69 @@ pub fn run() {
                         if !p.ends_with("src-tauri") { p.push("src-tauri"); }
                         p.join("resources")
                     };
-                    // 查找 node-v* 目录
-                    if let Ok(entries) = std::fs::read_dir(&resource_base) {
+
+                    fn copy_dir(src: &std::path::Path, dst: &std::path::Path) -> std::io::Result<()> {
+                        std::fs::create_dir_all(dst)?;
+                        for entry in std::fs::read_dir(src)? {
+                            let entry = entry?;
+                            let ty = entry.file_type()?;
+                            let dst_path = dst.join(entry.file_name());
+                            if ty.is_dir() {
+                                copy_dir(&entry.path(), &dst_path)?;
+                            } else {
+                                std::fs::copy(entry.path(), &dst_path)?;
+                            }
+                        }
+                        Ok(())
+                    }
+
+                    // 查找内置 Node.js: 优先 "node" 目录，其次 "node-v*" 目录
+                    let bundled_node_dir = if resource_base.join("node").exists() {
+                        Some(resource_base.join("node"))
+                    } else if let Ok(entries) = std::fs::read_dir(&resource_base) {
+                        let mut found = None;
                         for entry in entries.flatten() {
                             let name = entry.file_name();
                             let name_str = name.to_string_lossy();
                             if name_str.starts_with("node-v") {
-                                let _ = std::fs::remove_dir_all(&node_to);
-                                // 递归复制
-                                fn copy_dir(src: &std::path::Path, dst: &std::path::Path) -> std::io::Result<()> {
-                                    std::fs::create_dir_all(dst)?;
-                                    for entry in std::fs::read_dir(src)? {
-                                        let entry = entry?;
-                                        let ty = entry.file_type()?;
-                                        let dst_path = dst.join(entry.file_name());
-                                        if ty.is_dir() {
-                                            copy_dir(&entry.path(), &dst_path)?;
-                                        } else {
-                                            std::fs::copy(entry.path(), &dst_path)?;
-                                        }
-                                    }
-                                    Ok(())
-                                }
-                                if copy_dir(&entry.path(), &node_to).is_ok() {
-                                    tracing::info!("已复制内置 Node.js 到数据目录");
-                                }
+                                found = Some(entry.path());
                                 break;
                             }
                         }
+                        found
+                    } else {
+                        None
+                    };
+
+                    if let Some(src) = bundled_node_dir {
+                        let _ = std::fs::remove_dir_all(&node_to);
+                        if copy_dir(&src, &node_to).is_ok() {
+                            tracing::info!("已复制内置 Node.js 到数据目录: {:?}", node_to);
+                            // 确保 node 可执行
+                            #[cfg(unix)]
+                            {
+                                use std::os::unix::fs::PermissionsExt;
+                                let node_bin = node_to.join("bin").join("node");
+                                if node_bin.exists() {
+                                    if let Ok(perm) = node_bin.metadata().map(|m| m.permissions()) {
+                                        let mut p = perm;
+                                        p.set_mode(0o755);
+                                        let _ = std::fs::set_permissions(&node_bin, p);
+                                    }
+                                }
+                                // npm 也需要可执行
+                                let npm_bin = node_to.join("bin").join("npm");
+                                if npm_bin.exists() {
+                                    if let Ok(perm) = npm_bin.metadata().map(|m| m.permissions()) {
+                                        let mut p = perm;
+                                        p.set_mode(0o755);
+                                        let _ = std::fs::set_permissions(&npm_bin, p);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        tracing::info!("未找到内置 Node.js，用户需手动安装");
                     }
                 }
 
@@ -213,17 +248,20 @@ pub fn run() {
                         || !config.initial_setup_completed
                         || config.sillytavern.version.path != bundled_path;
                     if needs_update {
+                        // 检查内置酒馆是否有 node_modules
+                        let tavern_dir = std::path::PathBuf::from(&bundled_path);
+                        let has_nm = tavern_dir.join("node_modules").join("express").exists();
                         config.sillytavern.version = crate::types::LocalTavernItem {
                             version: "1.18.0".to_string(),
                             path: bundled_path,
-                            has_node_modules: true,
+                            has_node_modules: has_nm,
                         };
                         if !config.initial_setup_completed {
                             config.initial_setup_completed = true;
                         }
                         config.setup_checkpoint = Some("DONE".to_string());
                         let _ = config::write_app_config_to_disk(&handle, &config);
-                        tracing::info!("已自动配置内置酒馆 v1.18.0, path: {}", config.sillytavern.version.path);
+                        tracing::info!("已自动配置内置酒馆 v1.18.0, has_node_modules: {}, path: {}", has_nm, config.sillytavern.version.path);
                     }
                 }
             });

@@ -93,6 +93,10 @@ src-tauri/resources/
 !src-tauri/resources/character-cards/.gitkeep
 !src-tauri/resources/presets/
 !src-tauri/resources/presets/.gitkeep
+!src-tauri/resources/node/
+!src-tauri/resources/node/.gitkeep
+!src-tauri/resources/sillytavern-1.18.0/
+!src-tauri/resources/sillytavern-1.18.0/.gitkeep
 src-tauri/src/deep_tavern/
 src/deep-tavern/
 public/videos/
