@@ -153,7 +153,18 @@
 
 ## 📦 下载安装
 
-<div align="center">
+> 🚀 **国内用户下载加速**：GitHub 下载慢？把所有 Release 链接前缀替换为 `https://ghfast.top/` 即可高速下载：
+> 
+> | 版本 | GitHub 原链 | 🇨🇳 国内加速 |
+> |------|------------|-------------|
+> | 最新版 | [Releases](https://github.com/leigegehaha/sillytavernlauncher/releases/latest) | [ghfast.top 加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/latest) |
+> | v2.0.1 | [GitHub](https://github.com/leigegehaha/sillytavernlauncher/releases/tag/v2.0.1) | [ghfast.top 加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/tag/v2.0.1) |
+>
+> 💡 手动替换：把 Release 页面里 `.dmg` / `.exe` / `.AppImage` 的下载链接前面加上 `https://ghfast.top/` 即可。
+>
+> 🔁 备用代理：`https://ghproxy.cc/` `https://gh.llkk.cc/`
+
+<div align="center">"
 
 ### 🍎 macOS
 
