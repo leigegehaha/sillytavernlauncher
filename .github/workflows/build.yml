@@ -279,7 +279,10 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Tavern Deepseek Launcher v__VERSION__'
-          releaseBody: 'See the assets to download and install this version.'
+          releaseBody: |
+            🚀 国内用户高速下载：ghfast.top 加速通道
+            💡 把下方文件链接前缀替换为 https://ghfast.top/ 即可
+            🔁 备用代理：https://ghproxy.cc/ https://gh.llkk.cc
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
