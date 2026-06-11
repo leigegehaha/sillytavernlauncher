@@ -223,11 +223,52 @@ jobs:
             find src-tauri/resources/ -name "node" -o -name "node.exe" 2>/dev/null | head -5
           fi
 
-      - name: Ensure other resource directories exist
+      - name: Download bundled resources (character cards + presets)
         shell: bash
         run: |
-          mkdir -p src-tauri/resources/character-cards
-          mkdir -p src-tauri/resources/presets
+          echo "📥 Downloading bundled resources (character cards + presets)..."
+
+          RESOURCES_ZIP="/tmp/bundled-resources.zip"
+          RESOURCES_URL="https://github.com/leigegehaha/sillytavernlauncher/releases/download/resources-v2.0.0/bundled-resources.zip"
+
+          # Try multiple mirrors for the resources zip
+          for mirror in "" "https://ghfast.top/" "https://gh.llkk.cc/"; do
+            URL="${mirror}${RESOURCES_URL}"
+            echo "  Trying: ${URL}"
+            if curl -fsSL -o "${RESOURCES_ZIP}" "${URL}" --connect-timeout 30 --max-time 600; then
+              echo "  ✅ Downloaded successfully ($(du -sh ${RESOURCES_ZIP} | cut -f1))"
+              break
+            fi
+            echo "  ❌ Failed, trying next mirror..."
+          done
+
+          if [ ! -f "${RESOURCES_ZIP}" ] || [ ! -s "${RESOURCES_ZIP}" ]; then
+            echo "⚠️ Bundled resources download failed, creating empty placeholder directories"
+            mkdir -p src-tauri/resources/character-cards
+            mkdir -p src-tauri/resources/presets
+            exit 0
+          fi
+
+          # Extract: zip contains src-tauri/resources/character-cards/ and src-tauri/resources/presets/
+          echo "📦 Extracting bundled resources..."
+          unzip -qo "${RESOURCES_ZIP}" -d .
+
+          # Verify extraction
+          CARDS_COUNT=$(find src-tauri/resources/character-cards -type f -name "*.png" 2>/dev/null | wc -l)
+          PRESETS_COUNT=$(find src-tauri/resources/presets -type f -name "*.json" 2>/dev/null | wc -l)
+
+          if [ "${CARDS_COUNT}" -gt 0 ]; then
+            echo "✅ Character cards: ${CARDS_COUNT} PNG files extracted"
+          else
+            echo "⚠️ No character card PNGs found"
+          fi
+
+          if [ "${PRESETS_COUNT}" -gt 0 ]; then
+            echo "✅ Presets: ${PRESETS_COUNT} JSON files extracted"
+          else
+            echo "⚠️ No preset JSONs found"
+          fi
+
           echo "📋 Resource directory listing:"
           du -sh src-tauri/resources/*/ 2>/dev/null || echo "   (empty)"
 
