@@ -6,6 +6,9 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   SILLYTAVERN_VERSION: "1.18.0"
@@ -88,7 +91,7 @@ jobs:
           ST_URL="https://github.com/SillyTavern/SillyTavern/archive/refs/tags/${ST_VER}.zip"
           ST_ZIP="/tmp/sillytavern-${ST_VER}.zip"
 
-          # Try multiple mirrors
+          # Try multiple mirrors — CI runners are outside China, direct GitHub first
           for mirror in "" "https://ghfast.top/" "https://gh.llkk.cc/"; do
             URL="${mirror}${ST_URL}"
             echo "  Trying: ${URL}"
