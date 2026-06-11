@@ -145,7 +145,7 @@
 | 🖥️ **桌面** | [Tauri v2](https://v2.tauri.app/) | Rust 驱动，原生性能，体积 < 5MB |
 | 🎨 **前端** | Vue 3 + Vite + Tailwind CSS | 响应式 + 中世纪酒馆手工暗黑主题 |
 | ⚙️ **后端** | Rust · tokio · reqwest · serde | 异步 I/O，类型安全 |
-| 📦 **打包** | Tauri Bundler + GitHub Actions | macOS DMG · Windows MSI · Linux AppImage |
+| 📦 **打包** | Tauri Bundler + GitHub Actions | macOS DMG · Windows NSIS · Linux AppImage/deb/rpm |
 
 </div>
 
@@ -159,13 +159,26 @@
 
 [![Download macOS](https://img.shields.io/badge/下载_macOS_DMG-333333?style=for-the-badge&logo=apple)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
 
-下载 `.dmg` → 双击挂载 → 拖入 `Applications`
+1. 下载 `.dmg` → 双击挂载 → 拖入 `Applications`
+2. 首次打开如果提示 **"已损坏，无法打开"**，运行以下命令即可：
+
+```bash
+sudo xattr -rd com.apple.quarantine "/Applications/Tavern Deepseek.app"
+```
+
+> 💡 **为什么？** App 未签 Apple 开发者证书，macOS Gatekeeper 会自动隔离网上下载的应用。`xattr` 命令移除隔离标记即可。
 
 ### 🪟 Windows
 
-[![Download Windows](https://img.shields.io/badge/下载_Windows_MSI-0078D6?style=for-the-badge&logo=windows)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
+[![Download Windows](https://img.shields.io/badge/下载_Windows_安装包-0078D6?style=for-the-badge&logo=windows)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
 
-下载 `.msi` → 双击安装 → 开始使用
+下载 `.exe` 安装包 → 双击安装 → 开始使用
+
+### 🐧 Linux
+
+[![Download Linux](https://img.shields.io/badge/下载_Linux-FCC624?style=for-the-badge&logo=linux)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
+
+`.deb` / `.AppImage` / `.rpm` 三选一
 
 </div>
 
@@ -178,17 +191,17 @@
 git clone https://github.com/leigegehaha/sillytavernlauncher.git
 cd sillytavernlauncher
 
-# 安装依赖
-npm install
+# 安装依赖 (推荐 bun)
+bun install
 
 # 开发模式
-npm run tauri dev
+bun run tauri dev
 
 # 生产构建
-npm run tauri build
+bun run tauri build
 ```
 
-> 需要 [Rust](https://rustup.rs/) (latest stable) + [Node.js](https://nodejs.org/) 18+
+> 需要 [Rust](https://rustup.rs/) (latest stable) + [Bun](https://bun.sh/) 或 Node.js 18+
 
 ---
 
@@ -261,6 +274,40 @@ sillytavern-launcher/
 - [ ] **DeepTavern** — 内置聊天客户端
 - [ ] TTS 语音合成集成
 - [ ] 更多模型 Provider 支持
+
+---
+
+## ❓ 常见问题
+
+<details>
+<summary><b>🍎 macOS 打开提示"已损坏"/"无法验证开发者"</b></summary>
+
+**原因**：App 未签 Apple 开发者证书，macOS Gatekeeper 会自动隔离网上下载的应用。
+
+**解决**：在终端运行以下命令移除隔离标记：
+
+```bash
+sudo xattr -rd com.apple.quarantine "/Applications/Tavern Deepseek.app"
+```
+
+之后就能正常打开了。这是**一次性的**，不需要每次更新都重复。
+</details>
+
+<details>
+<summary><b>🔌 启动后提示"未找到内置酒馆"</b></summary>
+
+启动器会自动下载 SillyTavern 和 Node.js 到本地数据目录，**首次启动需要联网**。如果下载失败：
+
+1. 检查网络连接（可能需要代理）
+2. 在 **版本管理** 页面手动安装 SillyTavern
+3. 查看控制台日志排查具体错误
+</details>
+
+<details>
+<summary><b>🪟 Windows 安装时 SmartScreen 阻止</b></summary>
+
+点击 **"更多信息"** → **"仍要运行"** 即可。原因同上 — App 未签代码证书。
+</details>
 
 ---
 
