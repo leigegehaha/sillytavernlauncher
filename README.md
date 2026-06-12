@@ -147,40 +147,36 @@
 
 ## 📦 下载安装
 
-> 🚀 **国内用户下载加速**：点击下方 🇨🇳 加速链接，通过 `ghfast.top` 代理高速下载。
+> 🚀 以下按钮直达 `ghfast.top` 代理，国内高速下载。
 
-### 🍎 macOS（Intel / Apple Silicon）
+<div align="center">
 
-| 版本 | 文件 | GitHub | 🇨🇳 ghfast.top 加速 |
-|------|------|--------|---------------------|
-| Apple Silicon (M1-M4) | `.dmg` | [下载](https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_aarch64.dmg) | [🚀 国内加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_aarch64.dmg) |
-| Intel x64 | `.dmg` | [下载](https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_x64.dmg) | [🚀 国内加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_x64.dmg) |
+### 🍎 macOS
+
+[![macOS Apple Silicon](https://img.shields.io/badge/macOS_Apple_Silicon_(M1–M4)-下载_DMG-333333?style=for-the-badge&logo=apple)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_aarch64.dmg)
+[![macOS Intel](https://img.shields.io/badge/macOS_Intel_x64-下载_DMG-333333?style=for-the-badge&logo=apple)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_x64.dmg)
 
 1. 下载对应架构 `.dmg` → 双击挂载 → 拖入 `Applications`
-2. 首次打开如果提示 **"已损坏，无法打开"**，运行以下命令即可：
+2. 首次打开如果提示 **"已损坏，无法打开"**，运行：
 
 ```bash
 sudo xattr -rd com.apple.quarantine "/Applications/Tavern Deepseek.app"
 ```
 
-> 💡 **为什么？** App 未签 Apple 开发者证书，macOS Gatekeeper 会自动隔离网上下载的应用。
-
 ### 🪟 Windows
 
-| 文件 | GitHub | 🇨🇳 ghfast.top 加速 |
-|------|--------|---------------------|
-| `x64-setup.exe` (132MB) | [下载](https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_x64-setup.exe) | [🚀 国内加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_x64-setup.exe) |
+[![Windows x64](https://img.shields.io/badge/Windows_x64-下载_安装包-0078D6?style=for-the-badge&logo=windows)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_x64-setup.exe)
 
 下载安装包 → 双击安装 → 开始使用
 
 ### 🐧 Linux
 
-| 格式 | 文件 | GitHub | 🇨🇳 ghfast.top 加速 |
-|------|------|--------|---------------------|
-| `.deb` (Debian/Ubuntu) | `amd64.deb` (187MB) | [下载](https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_amd64.deb) | [🚀 国内加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_amd64.deb) |
-| `.AppImage` (免安装) | `amd64.AppImage` (245MB) | [下载](https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_amd64.AppImage) | [🚀 国内加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_amd64.AppImage) |
+[![Linux deb](https://img.shields.io/badge/Linux_.deb_(Debian/Ubuntu)-下载-FCC624?style=for-the-badge&logo=linux)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_amd64.deb)
+[![Linux AppImage](https://img.shields.io/badge/Linux_.AppImage_(免安装)-下载-FCC624?style=for-the-badge&logo=linux)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_amd64.AppImage)
 
-> 🔁 备用代理：`https://ghproxy.cc/` `https://gh.llkk.cc/`（把 GitHub 链接前缀替换即可）
+</div>
+
+> 🔁 备用代理：`https://ghproxy.cc/` `https://gh.llkk.cc/` | [📋 GitHub Release 页](https://github.com/leigegehaha/sillytavernlauncher/releases/tag/v2.0.1)
 
 ---
 
