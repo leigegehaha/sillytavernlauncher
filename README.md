@@ -13,7 +13,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](LICENSE)
 
 <p>
-  <sub>中世纪酒馆暗黑奇幻风 · 内置 DeepSeek Tavern 大模型 · 3000+ 角色卡即插即用</sub>
+  <sub>中世纪酒馆暗黑奇幻风 · 内置 DeepSeek Tavern 大模型 · 内置 DeepTavern 聊天 · 105 角色卡即插即用</sub>
 </p>
 
 </div>
@@ -91,15 +91,19 @@
 
 <table>
 <tr>
-  <td align="center" width="33%">
+  <td align="center" width="25%">
     <h3>🍺<br>酒馆大模型</h3>
     DeepSeek Tavern 模型服务<br>API Key 一键管理
   </td>
-  <td align="center" width="33%">
+  <td align="center" width="25%">
+    <h3>🗣️<br>DeepTavern</h3>
+    内置沉浸式聊天客户端<br>中世纪酒馆 UI · 流式对话
+  </td>
+  <td align="center" width="25%">
     <h3>🔑<br>API 连接</h3>
     多 Provider 密钥管理<br>OpenAI 兼容端点
   </td>
-  <td align="center" width="33%">
+  <td align="center" width="25%">
     <h3>▶️<br>一键启动</h3>
     SillyTavern 零配置<br>内置 Node.js 自动部署
   </td>
@@ -107,7 +111,7 @@
 <tr>
   <td align="center">
     <h3>🃏<br>角色卡管理</h3>
-    PNG 解析/导入/删除<br>3000+ 预设角色库
+    PNG 解析/导入/删除<br>105 张内置角色卡
   </td>
   <td align="center">
     <h3>🔌<br>拓展管理</h3>
@@ -117,19 +121,9 @@
     <h3>⚙️<br>酒馆选项</h3>
     config.yaml 可视化编辑<br>配置迁移一键完成
   </td>
-</tr>
-<tr>
   <td align="center">
     <h3>📦<br>版本管理</h3>
     SillyTavern 多版本<br>安装/切换/卸载
-  </td>
-  <td align="center">
-    <h3>🖥️<br>控制台</h3>
-    内置桌面窗口模式<br>沉浸式角色扮演体验
-  </td>
-  <td align="center">
-    <h3>🛠️<br>教程</h3>
-    配置修复/依赖检测<br>网络诊断一站搞定
   </td>
 </tr>
 </table>
@@ -164,13 +158,13 @@
 >
 > 🔁 备用代理：`https://ghproxy.cc/` `https://gh.llkk.cc/`
 
-<div align="center">"
+<div align="center">
 
-### 🍎 macOS
+### 🍎 macOS（Intel / Apple Silicon）
 
 [![Download macOS](https://img.shields.io/badge/下载_macOS_DMG-333333?style=for-the-badge&logo=apple)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
 
-1. 下载 `.dmg` → 双击挂载 → 拖入 `Applications`
+1. 下载对应架构 `.dmg`（M1/M2/M3/M4 选 `aarch64`，Intel 选 `x64`）→ 双击挂载 → 拖入 `Applications`
 2. 首次打开如果提示 **"已损坏，无法打开"**，运行以下命令即可：
 
 ```bash
@@ -183,13 +177,17 @@ sudo xattr -rd com.apple.quarantine "/Applications/Tavern Deepseek.app"
 
 [![Download Windows](https://img.shields.io/badge/下载_Windows_安装包-0078D6?style=for-the-badge&logo=windows)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
 
-下载 `.exe` 安装包 → 双击安装 → 开始使用
+下载 `x64-setup.exe` 安装包 → 双击安装 → 开始使用
 
 ### 🐧 Linux
 
 [![Download Linux](https://img.shields.io/badge/下载_Linux-FCC624?style=for-the-badge&logo=linux)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
 
-`.deb` / `.AppImage` / `.rpm` 三选一
+| 格式 | 说明 |
+|------|------|
+| `.deb` | Debian/Ubuntu 系 |
+| `.AppImage` | 免安装，`chmod +x` 后直接运行 |
+| `.rpm` | Fedora/openSUSE 系 |
 
 </div>
 
@@ -235,6 +233,13 @@ sillytavern-launcher/
 │   │   ├── Console.vue         # 🖥️ 控制台
 │   │   ├── Tools.vue           # 🛠️ 教程
 │   │   └── Settings.vue        # 设置
+│   ├── deep-tavern/            # 🗣️ DeepTavern 内置聊天
+│   │   ├── DeepTavernView.vue  # 全屏聊天主视图
+│   │   ├── components/         # 酒馆主题组件
+│   │   ├── stores/             # reactive 状态管理
+│   │   ├── composables/        # useStreamChat, useParticles
+│   │   ├── styles/             # tavern-theme.css
+│   │   └── types/              # TS 类型定义
 │   ├── components/
 │   │   ├── TavernAccount.vue   # 酒馆大模型账户
 │   │   └── BackgroundVideo.vue # 动态背景
@@ -243,6 +248,11 @@ sillytavern-launcher/
 │   ├── src/
 │   │   ├── lib.rs              # 应用入口
 │   │   ├── sillytavern.rs      # SillyTavern 管理
+│   │   ├── deep_tavern/        # DeepTavern 后端
+│   │   │   ├── api_config.rs   # API 配置管理
+│   │   │   ├── character_reader.rs # 角色卡读取
+│   │   │   ├── chat_engine.rs  # 流式聊天引擎
+│   │   │   └── chat_storage.rs # 聊天记录存储
 │   │   ├── secrets.rs          # API 密钥管理
 │   │   ├── tavern_api.rs       # 酒馆 API 客户端
 │   │   ├── config.rs           # 配置管理
@@ -280,9 +290,11 @@ sillytavern-launcher/
 
 - [x] macOS 原生支持
 - [x] DeepSeek Tavern 酒馆大模型集成
-- [x] 角色卡管理 + 3000+ 预设
+- [x] 角色卡管理 + 105 内置角色卡
 - [x] GitHub Actions 跨平台自动构建
-- [ ] **DeepTavern** — 内置聊天客户端
+- [x] **DeepTavern** — 内置沉浸式聊天客户端（中世纪酒馆 UI）
+- [x] 内置 SillyTavern + Node.js（零配置启动）
+- [x] 内置角色卡 + 预设（开箱即用）
 - [ ] TTS 语音合成集成
 - [ ] 更多模型 Provider 支持
 
@@ -307,11 +319,12 @@ sudo xattr -rd com.apple.quarantine "/Applications/Tavern Deepseek.app"
 <details>
 <summary><b>🔌 启动后提示"未找到内置酒馆"</b></summary>
 
-启动器会自动下载 SillyTavern 和 Node.js 到本地数据目录，**首次启动需要联网**。如果下载失败：
+v2.0.1 起已内置 SillyTavern + Node.js，正常启动即可。如果仍提示未找到：
 
-1. 检查网络连接（可能需要代理）
-2. 在 **版本管理** 页面手动安装 SillyTavern
-3. 查看控制台日志排查具体错误
+1. 确认下载的是 **v2.0.1+** 版本（安装包大小 > 130MB）
+2. 检查网络连接（首次启动需联网安装依赖 `npm install`）
+3. 在 **版本管理** 页面查看 SillyTavern 状态
+4. 查看控制台日志排查具体错误
 </details>
 
 <details>
