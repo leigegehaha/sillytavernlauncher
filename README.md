@@ -157,11 +157,27 @@
 [![macOS Intel](https://img.shields.io/badge/macOS_Intel_x64-下载_DMG-333333?style=for-the-badge&logo=apple)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_x64.dmg)
 
 1. 下载对应架构 `.dmg` → 双击挂载 → 拖入 `Applications`
-2. 首次打开如果提示 **"已损坏，无法打开"**，运行：
+2. 双击打开 → 可能提示「已损坏，无法打开」（见下方修复 👇）
+
+#### 🔧 提示"文件已损坏"怎么办？
+
+> 这不是真的损坏 — 是因为 App 没有签 Apple 开发者证书，macOS Gatekeeper 把它隔离了。
+
+**方式一：终端命令（推荐，一劳永逸）**
+
+打开「终端」粘贴回车：
 
 ```bash
 sudo xattr -rd com.apple.quarantine "/Applications/Tavern Deepseek.app"
 ```
+
+**方式二：系统设置放行**
+
+「系统设置 → 隐私与安全性」→ 底部会看到被拦截的记录 → 点击 **「仍要打开」**
+
+只需操作一次，之后更新版本也不需要重复 ✅
+
+> 💡 或下载一键修复脚本：[fix-macos.sh](https://raw.githubusercontent.com/leigegehaha/sillytavernlauncher/refs/heads/GUI/scripts/fix-macos.sh) → 终端运行 `bash ~/Downloads/fix-macos.sh`
 
 ### 🪟 Windows
 
@@ -290,17 +306,26 @@ sillytavern-launcher/
 ## ❓ 常见问题
 
 <details>
-<summary><b>🍎 macOS 打开提示"已损坏"/"无法验证开发者"</b></summary>
+<summary><b>🍎 macOS 提示"已损坏，无法打开"/"无法验证开发者"</b></summary>
+<br>
 
-**原因**：App 未签 Apple 开发者证书，macOS Gatekeeper 会自动隔离网上下载的应用。
+**你会看到的错误信息：**
 
-**解决**：在终端运行以下命令移除隔离标记：
+> 「Tavern Deepseek.app」已损坏，无法打开。你应该将它移到废纸篓。
+> _或_
+> 无法打开「Tavern Deepseek.app」，因为无法验证开发者。
 
-```bash
-sudo xattr -rd com.apple.quarantine "/Applications/Tavern Deepseek.app"
-```
+**原因**：App 未签 Apple 开发者证书（$99/年），macOS Gatekeeper 会自动隔离从网上下载的未签名应用。**文件本身没有损坏**。
 
-之后就能正常打开了。这是**一次性的**，不需要每次更新都重复。
+**解决方式（二选一）**：
+
+| 方式 | 操作 | 效果 |
+|------|------|------|
+| 🖥️ **终端命令** | 粘贴运行 `sudo xattr -rd com.apple.quarantine "/Applications/Tavern Deepseek.app"` | 一劳永逸，移除隔离标记 |
+| ⚙️ **系统设置** | 「系统设置 → 隐私与安全性」→ 底部点击「仍要打开」 | 手动放行，每次更新需重复 |
+
+> 💡 这是**一次性操作** — 同版本不需要重复。更新到新版本时可能需要再执行一次。
+
 </details>
 
 <details>
