@@ -147,49 +147,40 @@
 
 ## 📦 下载安装
 
-> 🚀 **国内用户下载加速**：GitHub 下载慢？把所有 Release 链接前缀替换为 `https://ghfast.top/` 即可高速下载：
-> 
-> | 版本 | GitHub 原链 | 🇨🇳 国内加速 |
-> |------|------------|-------------|
-> | 最新版 | [Releases](https://github.com/leigegehaha/sillytavernlauncher/releases/latest) | [ghfast.top 加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/latest) |
-> | v2.0.1 | [GitHub](https://github.com/leigegehaha/sillytavernlauncher/releases/tag/v2.0.1) | [ghfast.top 加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/tag/v2.0.1) |
->
-> 💡 手动替换：把 Release 页面里 `.dmg` / `.exe` / `.AppImage` 的下载链接前面加上 `https://ghfast.top/` 即可。
->
-> 🔁 备用代理：`https://ghproxy.cc/` `https://gh.llkk.cc/`
-
-<div align="center">
+> 🚀 **国内用户下载加速**：点击下方 🇨🇳 加速链接，通过 `ghfast.top` 代理高速下载。
 
 ### 🍎 macOS（Intel / Apple Silicon）
 
-[![Download macOS](https://img.shields.io/badge/下载_macOS_DMG-333333?style=for-the-badge&logo=apple)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
+| 版本 | 文件 | GitHub | 🇨🇳 ghfast.top 加速 |
+|------|------|--------|---------------------|
+| Apple Silicon (M1-M4) | `.dmg` | [下载](https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_aarch64.dmg) | [🚀 国内加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_aarch64.dmg) |
+| Intel x64 | `.dmg` | [下载](https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_x64.dmg) | [🚀 国内加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_x64.dmg) |
 
-1. 下载对应架构 `.dmg`（M1/M2/M3/M4 选 `aarch64`，Intel 选 `x64`）→ 双击挂载 → 拖入 `Applications`
+1. 下载对应架构 `.dmg` → 双击挂载 → 拖入 `Applications`
 2. 首次打开如果提示 **"已损坏，无法打开"**，运行以下命令即可：
 
 ```bash
 sudo xattr -rd com.apple.quarantine "/Applications/Tavern Deepseek.app"
 ```
 
-> 💡 **为什么？** App 未签 Apple 开发者证书，macOS Gatekeeper 会自动隔离网上下载的应用。`xattr` 命令移除隔离标记即可。
+> 💡 **为什么？** App 未签 Apple 开发者证书，macOS Gatekeeper 会自动隔离网上下载的应用。
 
 ### 🪟 Windows
 
-[![Download Windows](https://img.shields.io/badge/下载_Windows_安装包-0078D6?style=for-the-badge&logo=windows)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
+| 文件 | GitHub | 🇨🇳 ghfast.top 加速 |
+|------|--------|---------------------|
+| `x64-setup.exe` (132MB) | [下载](https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_x64-setup.exe) | [🚀 国内加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_x64-setup.exe) |
 
-下载 `x64-setup.exe` 安装包 → 双击安装 → 开始使用
+下载安装包 → 双击安装 → 开始使用
 
 ### 🐧 Linux
 
-[![Download Linux](https://img.shields.io/badge/下载_Linux-FCC624?style=for-the-badge&logo=linux)](https://github.com/leigegehaha/sillytavernlauncher/releases/latest)
+| 格式 | 文件 | GitHub | 🇨🇳 ghfast.top 加速 |
+|------|------|--------|---------------------|
+| `.deb` (Debian/Ubuntu) | `amd64.deb` (187MB) | [下载](https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_amd64.deb) | [🚀 国内加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_amd64.deb) |
+| `.AppImage` (免安装) | `amd64.AppImage` (245MB) | [下载](https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_amd64.AppImage) | [🚀 国内加速](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_amd64.AppImage) |
 
-| 格式 | 说明 |
-|------|------|
-| `.deb` | Debian/Ubuntu 系 |
-| `.AppImage` | 免安装，`chmod +x` 后直接运行 |
-| `.rpm` | Fedora/openSUSE 系 |
-
-</div>
+> 🔁 备用代理：`https://ghproxy.cc/` `https://gh.llkk.cc/`（把 GitHub 链接前缀替换即可）
 
 ---
 
