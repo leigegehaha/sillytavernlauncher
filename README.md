@@ -153,8 +153,8 @@
 
 ### 🍎 macOS
 
-[![macOS Apple Silicon](https://img.shields.io/badge/macOS_Apple_Silicon_(M1–M4)-下载_DMG-333333?style=for-the-badge&logo=apple)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_aarch64.dmg)
-[![macOS Intel](https://img.shields.io/badge/macOS_Intel_x64-下载_DMG-333333?style=for-the-badge&logo=apple)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_x64.dmg)
+[![macOS Apple Silicon](https://img.shields.io/badge/macOS_Apple_Silicon_(M1–M4)-下载_DMG-333333?style=for-the-badge&logo=apple)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.2/Tavern.Deepseek_2.0.2_aarch64.dmg)
+[![macOS Intel](https://img.shields.io/badge/macOS_Intel_x64-下载_DMG-333333?style=for-the-badge&logo=apple)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.2/Tavern.Deepseek_2.0.2_x64.dmg)
 
 1. 下载对应架构 `.dmg` → 双击挂载 → 拖入 `Applications`
 2. 双击打开 → 可能提示「已损坏，无法打开」（见下方修复 👇）
@@ -181,18 +181,18 @@ sudo xattr -rd com.apple.quarantine "/Applications/Tavern Deepseek.app"
 
 ### 🪟 Windows
 
-[![Windows x64](https://img.shields.io/badge/Windows_x64-下载_安装包-0078D6?style=for-the-badge&logo=windows)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_x64-setup.exe)
+[![Windows x64](https://img.shields.io/badge/Windows_x64-下载_安装包-0078D6?style=for-the-badge&logo=windows)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.2/Tavern.Deepseek_2.0.2_x64-setup.exe)
 
 下载安装包 → 双击安装 → 开始使用
 
 ### 🐧 Linux
 
-[![Linux deb](https://img.shields.io/badge/Linux_.deb_(Debian/Ubuntu)-下载-FCC624?style=for-the-badge&logo=linux)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_amd64.deb)
-[![Linux AppImage](https://img.shields.io/badge/Linux_.AppImage_(免安装)-下载-FCC624?style=for-the-badge&logo=linux)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.1/Tavern.Deepseek_2.0.1_amd64.AppImage)
+[![Linux deb](https://img.shields.io/badge/Linux_.deb_(Debian/Ubuntu)-下载-FCC624?style=for-the-badge&logo=linux)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.2/Tavern.Deepseek_2.0.2_amd64.deb)
+[![Linux AppImage](https://img.shields.io/badge/Linux_.AppImage_(免安装)-下载-FCC624?style=for-the-badge&logo=linux)](https://ghfast.top/https://github.com/leigegehaha/sillytavernlauncher/releases/download/v2.0.2/Tavern.Deepseek_2.0.2_amd64.AppImage)
 
 </div>
 
-> 🔁 备用代理：`https://ghproxy.cc/` `https://gh.llkk.cc/` | [📋 GitHub Release 页](https://github.com/leigegehaha/sillytavernlauncher/releases/tag/v2.0.1)
+> 🔁 备用代理：`https://ghproxy.cc/` `https://gh.llkk.cc/` | [📋 GitHub Release 页](https://github.com/leigegehaha/sillytavernlauncher/releases/tag/v2.0.2)
 
 ---
 
@@ -331,9 +331,9 @@ sillytavern-launcher/
 <details>
 <summary><b>🔌 启动后提示"未找到内置酒馆"</b></summary>
 
-v2.0.1 起已内置 SillyTavern + Node.js，正常启动即可。如果仍提示未找到：
+v2.0.2 起已内置 SillyTavern + Node.js + 所有依赖，开箱即用。如果仍提示未找到：
 
-1. 确认下载的是 **v2.0.1+** 版本（安装包大小 > 130MB）
+1. 确认下载的是 **v2.0.2+** 版本（安装包大小 > 160MB）
 2. 检查网络连接（首次启动需联网安装依赖 `npm install`）
 3. 在 **版本管理** 页面查看 SillyTavern 状态
 4. 查看控制台日志排查具体错误
