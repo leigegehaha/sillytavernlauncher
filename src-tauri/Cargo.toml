@@ -1,7 +1,7 @@
 [package]
 name = "tavern-deepseek-launcher"
-version = "2.0.0"
-description = "Tavern Deepseek - 酒馆启动器，专为 SillyTavern 设计的跨平台桌面客户端。中世纪酒馆风格界面，Fork from al01cn/sillytavern-launcher by AL01.CN。"
+version = "2.0.2"
+description = "Tavern Deepseek - 酒馆启动器，专为 SillyTavern 设计的跨平台桌面客户端，基于 Tauri v2 + Vue 3 + Rust 构建。中世纪酒馆风格界面，让您无需命令行即可完整管理 SillyTavern 的安装、启动、配置和扩展。Fork from al01cn/sillytavern-launcher。"
 authors = ["磊哥哥"]
 edition = "2021"
 
