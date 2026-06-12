@@ -159,7 +159,10 @@ pub fn run() {
             let data_path = path.clone();
             tauri::async_runtime::spawn(async move {
                 // 1. 自动配置内置 Node.js
-                let node_to = data_path.join("node");
+                // IMPORTANT: Node.js must be copied to data_path/data/node/ to match
+                // the path used by get_config_path().parent() in node.rs and sillytavern.rs
+                let data_subdir = data_path.join("data");
+                let node_to = data_subdir.join("node");
                 let node_exe = if cfg!(target_os = "windows") {
                     node_to.join("node.exe")
                 } else {

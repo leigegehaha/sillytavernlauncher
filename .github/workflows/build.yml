@@ -130,8 +130,17 @@ jobs:
             fi
           fi
 
-          # Remove node_modules if present (will be installed on first launch)
-          rm -rf "${ST_RESOURCE}/node_modules" 2>/dev/null || true
+          # Install SillyTavern dependencies during build so users don't need
+          # internet or npm on first launch (核心卖点：不用安装依赖)
+          echo "📦 Installing SillyTavern dependencies..."
+          cd "${ST_RESOURCE}"
+          npm install --omit=dev --no-audit --no-fund --no-save 2>&1 || echo "⚠️ npm install failed, deps will be installed on first launch"
+          cd -
+          
+          # SECURITY: Remove any user data files (secrets, settings) that might have
+          # been accidentally included in the SillyTavern source archive
+          rm -f "${ST_RESOURCE}/data/default-user/secrets.json" 2>/dev/null || true
+          rm -f "${ST_RESOURCE}/data/default-user/settings.json" 2>/dev/null || true
 
           # Verify extraction
           if [ -f "${ST_RESOURCE}/server.js" ]; then
